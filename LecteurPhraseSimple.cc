@@ -80,15 +80,40 @@ LecteurPhraseSimple::expression ()
 }
 
 void
+LecteurPhraseSimple::expBool()
+// <expBool> ::= <relation> {<opBool> <relation>}
+{
+  relation ();
+  while (ls.getSymCour () == "+" || ls.getSymCour () == "-")
+    {
+      opBool ();
+      relation ();
+    }
+
+}
+
+void
+LecteurPhraseSimple::relation()
+//<relation> ::= <expression> {<opRel> <expression>}
+{
+  expression ();
+  while (ls.getSymCour () == "+" || ls.getSymCour () == "-")
+    {
+      opRel ();
+      expression ();
+    }
+}
+
+void
 LecteurPhraseSimple::terme ()
 {
-// <expression> ::= <facteur> { <opAdd> <facteur> }
+// <terme> ::= <facteur> { <opMult> <facteur> }
 
-  terme ();
+  facteur ();
   while (ls.getSymCour () == "*" || ls.getSymCour () == "/")
     {
-      opAdd ();
-      terme ();
+      opMult ();
+      facteur ();
     }
 }
 
@@ -96,19 +121,19 @@ LecteurPhraseSimple::terme ()
 void
 LecteurPhraseSimple::facteur ()
 {
-// <facteur> ::= <entier>  |  <variable>  |  - <facteur>  |  ( <expression> )
+// <facteur> ::= <entier>  |  <variable>  |  <opUnaire> <opBool>  |  ( <expBool> )
 
   if (ls.getSymCour () == "<VARIABLE>" || ls.getSymCour () == "<ENTIER>" || ls.getSymCour () =="<CHAINE>")
     ls.suivant ();
-  else if (ls.getSymCour () == "-")
+  else if (ls.getSymCour () == "-" ||ls.getSymCour () == "not")
     {
       ls.suivant ();
-      facteur ();
+      opBool();
     }
   else if (ls.getSymCour () == "(")
     {
       ls.suivant ();
-      expression ();
+      expBool ();
       sauterSymCour (")");
     }
   else
@@ -135,6 +160,38 @@ LecteurPhraseSimple::opMult ()
   else
     erreur ("<opMult>");
 }
+void
+LecteurPhraseSimple::opBool ()
+//<opBool>::= et | ou
+{
+   if(ls.getSymCour()=="et" || ls.getSymCour()=="ou")
+     ls.suivant();
+   else
+     erreur("<opBool>");
+}
+
+void
+LecteurPhraseSimple::opRel()
+//<opRel>::= == | != | < | <= | > |>=
+{
+  if(ls.getSymCour()=="==" || ls.getSymCour()=="!=" ||
+     ls.getSymCour()=="<"|| ls.getSymCour()=="<="   ||
+     ls.getSymCour()==">"|| ls.getSymCour()==">=")
+    ls.suivant();
+  else
+    erreur("<opRel>");
+}
+
+void
+LecteurPhraseSimple::opUnaire ()
+//<opUnaire>::= - | non
+{
+   if(ls.getSymCour()=="-" || ls.getSymCour()=="non")
+     ls.suivant();
+   else
+     erreur("<opUnaire>");
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 void

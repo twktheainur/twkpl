@@ -23,6 +23,7 @@ private:
   void affectation ();		// <affectation> ::= <variable> = <expression>
   void expression ();		//  <expression> ::= <facteur> { <opBinaire> <facteur> }
   void facteur ();		//     <facteur> ::= <entier>  |  <variable>  |  - <facteur>  |  ( <expression> )
+  void terme ();                // <terme> ::= <facteur> { <opAdd> <facteur> }
   //void opBinaire ();		//  <opBinaire>  ::= + | - | *  | /
   void opAdd();                 // <opAdd>  ::= + | -
   void opMult();                // <opMult>  ::=  *  | /
