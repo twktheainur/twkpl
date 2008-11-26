@@ -3,5 +3,6 @@ debut
 #hey
 #fuck!
   i="salut";
+  j=2*2*(5+9-4/9);
 fin
 
