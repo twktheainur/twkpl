@@ -33,6 +33,10 @@ private:
   void expBool ();
   void opUnaire ();
 
+  void instSi();
+  void instTq();
+  void instRepeter();
+
 
   // outils pour se simplifier l'analyse syntaxique
   void testerSymCour (string ch);	// si symbole courant != ch, erreur : on arrete le programme, sinon rien
