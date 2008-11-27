@@ -17,3 +17,10 @@ fin
 et
 ou
 non
+si
+sinon
+sinonsi
+tantque
+fintantque
+repeter
+jusqua

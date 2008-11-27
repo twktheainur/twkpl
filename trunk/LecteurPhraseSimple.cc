@@ -41,7 +41,7 @@ LecteurPhraseSimple::seqInst ()
       inst ();
       sauterSymCour (";");
     }
-  while (ls.getSymCour () == "<VARIABLE>");
+  while (ls.getSymCour () == "<VARIABLE>" || ls.getSymCour () == "si" || ls.getSymCour () == "tantque" || ls.getSymCour () == "repeter");
   // tant que le symbole courant est un debut possible d'instruction...
 }
 
@@ -51,7 +51,16 @@ LecteurPhraseSimple::inst ()
 {
 // <inst> ::= <affectation>
 
-  affectation ();
+  if(ls.getSymCour () == "<VARIABLE>")
+    {
+      affectation ();
+    }
+  else if(ls.getSymCour () == "si")
+      instSi();
+  else if(ls.getSymCour () == "tantque")
+    instTq();
+  else if(ls.getSymCour () == "repeter")
+    instRepeter();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -61,7 +70,7 @@ LecteurPhraseSimple::affectation ()
 // <affectation> ::= <variable> = <expression>
 
   sauterSymCour ("<VARIABLE>");
-  sauterSymCour ("<MOTCLE>");
+  sauterSymCour ("=");
   expression ();
   //relation();
 }
@@ -85,7 +94,7 @@ LecteurPhraseSimple::expBool ()
 // <expBool> ::= <relation> {<opBool> <relation>}
 {
   relation ();
-  while (ls.getSymCour () == "+" || ls.getSymCour () == "-")
+  while (ls.getSymCour () == "et" || ls.getSymCour () == "ou")
     {
       opBool ();
       relation ();
@@ -124,7 +133,7 @@ LecteurPhraseSimple::terme ()
 void
 LecteurPhraseSimple::facteur ()
 {
-// <facteur> ::= <entier>  |  <variable>  |  [<opUnaire>] <expBool>  |  ( <expBool> )
+// <facteur> ::= <entier>  |  <variable>  |chaine |  <opUnaire> <expBool>  |  ( <expBool> )
 
   if (ls.getSymCour () == "<VARIABLE>" || ls.getSymCour () == "<ENTIER>"
       || ls.getSymCour () == "<CHAINE>")
@@ -142,6 +151,66 @@ LecteurPhraseSimple::facteur ()
     }
   else
     erreur ("<facteur>");
+}
+void
+LecteurPhraseSimple::instSi()
+{//<instSi> ::= si ( <expBool> ) <seqInst> { sinonsi ( <expBool> ) <seqInst> }
+//  [ sinon <seqInst> ] finsi
+    sauterSymCour("si");
+    //ls.suivant();
+    if(ls.getSymCour ()=="(")
+      {
+        ls.suivant();
+        expBool();
+        sauterSymCour(")");
+      }
+    seqInst();
+    while(ls.getSymCour ()=="sinonsi")
+      {
+        ls.suivant();
+        if(ls.getSymCour ()=="(")
+          {
+            ls.suivant();
+            expBool();
+            sauterSymCour(")");
+          }
+        seqInst();
+      }
+    if(ls.getSymCour ()=="sinon")
+      {
+        seqInst();
+        ls.suivant();
+      }
+}
+
+void
+LecteurPhraseSimple::instTq()
+{
+  //<instTq> ::= tantque ( <expBool> ) <seqInst> fintantque
+    sauterSymCour("tantque");
+    if(ls.getSymCour ()=="(")
+      {
+        ls.suivant();
+        expBool();
+        sauterSymCour(")");
+      }
+    seqInst();
+    sauterSymCour("fintantque");
+}
+
+void
+LecteurPhraseSimple::instRepeter()
+{
+  //<instRepeter> ::= repeter <seqInst> jusqua ( <expBool> )
+    sauterSymCour("repeter");
+    seqInst();
+    sauterSymCour("jusqua");
+    if(ls.getSymCour ()=="(")
+          {
+            ls.suivant();
+            expBool();
+            sauterSymCour(")");
+          }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -171,8 +240,12 @@ LecteurPhraseSimple::opBool ()
 //<opBool>::= et | ou
 {
   if (ls.getSymCour () == "et" || ls.getSymCour () == "ou")
+  {
     ls.suivant ();
+    //return true;
+  }
   else
+   // return false;
     erreur ("<opBool>");
 }
 
@@ -203,7 +276,6 @@ LecteurPhraseSimple::opUnaire ()
 void
 LecteurPhraseSimple::testerSymCour (string ch)
 {
-	cout << ls.getSymCour() << " " << ch << endl;
   if (ls.getSymCour () != ch)
     {
       cout << endl << "-------- Erreur ligne " << ls.getLigne ()
