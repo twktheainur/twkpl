@@ -23,10 +23,15 @@ private:
   void affectation ();		// <affectation> ::= <variable> = <expression>
   void expression ();		//  <expression> ::= <facteur> { <opBinaire> <facteur> }
   void facteur ();		//     <facteur> ::= <entier>  |  <variable>  |  - <facteur>  |  ( <expression> )
-  void terme ();                // <terme> ::= <facteur> { <opAdd> <facteur> }
-  //void opBinaire ();		//  <opBinaire>  ::= + | - | *  | /
-  void opAdd();                 // <opAdd>  ::= + | -
-  void opMult();                // <opMult>  ::=  *  | /
+  void terme ();		// <terme> ::= <facteur> { <opAdd> <facteur> }
+  //void opBinaire ();          //  <opBinaire>  ::= + | - | *  | /
+  void opAdd ();		// <opAdd>  ::= + | -
+  void opMult ();		// <opMult>  ::=  *  | /
+  void opBool ();
+  void relation ();
+  void opRel ();
+  void expBool ();
+  void opUnaire ();
 
 
   // outils pour se simplifier l'analyse syntaxique

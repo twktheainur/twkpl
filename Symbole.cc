@@ -16,6 +16,8 @@ Symbole::Symbole (string s)
     this->categorie = ENTIER;
   else if (isMotCle (s))
     this->categorie = MOTCLE;
+  else if (s=="non" || s=="-" || s=="et" || s=="ou")
+  	this->categorie= MOTCLE;
   else if (isalpha (s[0]))
     this->categorie = VARIABLE;
   else if (s[0] == '\"' && s[s.length () - 1] == '\"')
@@ -25,30 +27,35 @@ Symbole::Symbole (string s)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool
-Symbole::operator == (string ch)
+bool Symbole::operator == (string ch)
 {
-  string s (ch);
+  string
+  s (ch);
   return this->chaine == s ||
     (this->categorie == VARIABLE && s == "<VARIABLE>") ||
     (this->categorie == ENTIER && s == "<ENTIER>") ||
     (this->categorie == CHAINE && s == "<CHAINE>") ||
+    (this->categorie == MOTCLE && s == "<MOTCLE>") ||
     (this->categorie == INDEFINI && s == "<INDEFINI>") ||
     (this->categorie == FINDEFICHIER && s == "<FINDEFICHIER>");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool
-Symbole::isMotCle (string s)
+bool Symbole::isMotCle (string s)
 {
-  static vector < string > motsCles;	// vecteur pour stocker les mots clés du langage
+  static
+    vector <
+    string >
+    motsCles;			// vecteur pour stocker les mots clés du langage
   // si on n'a pas encore chargé les mots clés dans le vecteur, on le fait !
   if (!motsCles.size ())
     {
-      ifstream fichier (FICHIER_MOTS_CLE, ifstream::in);
+      ifstream
+      fichier (FICHIER_MOTS_CLE, ifstream::in);
       while (!fichier.eof ())
 	{
-	  string mot;
+	  string
+	    mot;
 	  getline (fichier, mot);
 	  if (mot != "")
 	    {			// insertion triée de s dans le vecteur des mots clés
@@ -62,8 +69,9 @@ Symbole::isMotCle (string s)
       fichier.close ();
     }
   // on recherche  s dans le vecteur des mots clés triés
-  unsigned int i;
-  for (i = 0; i < motsCles.size () && motsCles[i] < s; i++);
+  unsigned int
+    i;
+  for (i = 0; i < motsCles.size () && motsCles[i] < s; i++) ;
   return (i < motsCles.size () && motsCles[i] == s);
 }
 
