@@ -26,8 +26,8 @@ void
 NoeudSeqInst::afficher (unsigned short indentation)
 {
   Noeud::afficher (indentation);
-  cout << "Noeud - Sequence de " << tabInst.
-    size () << " instruction(s)" << endl;
+  cout << "Noeud - Sequence de " << tabInst.size () << " instruction(s)" <<
+    endl;
   for (unsigned int i = 0; i < tabInst.size (); i++)
     tabInst[i]->afficher (indentation + 1);	// on affiche les fils en augmentant l'indentation
 }
@@ -110,8 +110,8 @@ void
 NoeudOperateurBinaire::afficher (unsigned short indentation)
 {
   Noeud::afficher (indentation);
-  cout << "Noeud - Operateur Binaire \"" << this->operateur.
-    getChaine () << "\" applique a : " << endl;
+  cout << "Noeud - Operateur Binaire \"" << this->
+    operateur.getChaine () << "\" applique a : " << endl;
   operandeGauche->afficher (indentation + 1);	// on affiche fils gauche et fils droit
   operandeDroit->afficher (indentation + 1);	// en augmentant l'indentation
 }

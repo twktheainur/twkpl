@@ -4,5 +4,9 @@ debut
 #fuck!
   i="salut";
   j=2*2*(5+9-4/9);
+  i>=3;
+  j>=2 et i!=4;
+  i >= 3;
+  i < j et (j > k) ou (c) = 0;
 fin
 

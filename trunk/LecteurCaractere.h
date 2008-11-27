@@ -8,7 +8,8 @@ class LecteurCaractere
 {
 
   ////////////////////////////////////////////////////////////////////////////////
-  public:LecteurCaractere (string nomFich);	// construit le lecteur pour parcourir nomFich
+public:LecteurCaractere (string nomFich);
+					// construit le lecteur pour parcourir nomFich
   inline char getCarCour ()
   {
     return carCour;

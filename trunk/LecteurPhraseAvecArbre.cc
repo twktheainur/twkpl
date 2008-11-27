@@ -122,11 +122,11 @@ LecteurPhraseAvecArbre::facteur ()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Symbole
-LecteurPhraseAvecArbre::opBinaire ()
+Symbole LecteurPhraseAvecArbre::opBinaire ()
 {
 // <opBinaire> ::= + | - | *  | /
-  Symbole operateur;
+  Symbole
+    operateur;
   if (ls.getSymCour () == "+" || ls.getSymCour () == "-" ||
       ls.getSymCour () == "*" || ls.getSymCour () == "/")
     {
