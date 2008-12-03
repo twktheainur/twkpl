@@ -36,6 +36,10 @@ private:
   void instSi();
   void instTq();
   void instRepeter();
+  void instPour();
+
+  void instLire();
+  void instEcrire();
 
 
   // outils pour se simplifier l'analyse syntaxique

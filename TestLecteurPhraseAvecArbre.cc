@@ -2,7 +2,7 @@
 using namespace std;
 #include "LecteurPhraseAvecArbre.h"
 
-int
+/*int
 main (int argc, char *argv[])
 {
   char nomFich[255];
@@ -25,4 +25,4 @@ main (int argc, char *argv[])
   lp.getArbre ()->getValeur ();
   cout << endl << "Table des symboles apres evaluation : " << lp.getTs ();
   return 0;
-}
+}*/

@@ -41,7 +41,9 @@ LecteurPhraseSimple::seqInst ()
       inst ();
       sauterSymCour (";");
     }
-  while (ls.getSymCour () == "<VARIABLE>" || ls.getSymCour () == "si" || ls.getSymCour () == "tantque" || ls.getSymCour () == "repeter");
+  while (ls.getSymCour () == "<VARIABLE>" || ls.getSymCour () == "si" ||
+         ls.getSymCour () == "tantque" || ls.getSymCour () == "repeter" ||
+         ls.getSymCour () == "lire" || ls.getSymCour () == "ecrire");
   // tant que le symbole courant est un debut possible d'instruction...
 }
 
@@ -61,6 +63,10 @@ LecteurPhraseSimple::inst ()
     instTq();
   else if(ls.getSymCour () == "repeter")
     instRepeter();
+  else if(ls.getSymCour () == "lire")
+    instLire();
+  else if(ls.getSymCour () == "ecrire")
+    instEcrire();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -178,9 +184,10 @@ LecteurPhraseSimple::instSi()
       }
     if(ls.getSymCour ()=="sinon")
       {
-        seqInst();
         ls.suivant();
+        seqInst();
       }
+    sauterSymCour("finsi");
 }
 
 void
@@ -212,6 +219,25 @@ LecteurPhraseSimple::instRepeter()
             sauterSymCour(")");
           }
 }
+void
+LecteurPhraseSimple::instLire()
+{
+  sauterSymCour("lire");
+  sauterSymCour("(");
+  sauterSymCour("<VARIABLE>");
+  sauterSymCour(")");
+}
+void
+LecteurPhraseSimple::instEcrire()
+{
+  sauterSymCour("ecrire");
+  sauterSymCour("(");
+  if(ls.getSymCour()=="<CHAINE>")
+    ls.suivant();
+  else
+    expression();
+  sauterSymCour(")");
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 void
@@ -242,12 +268,12 @@ LecteurPhraseSimple::opBool ()
   if (ls.getSymCour () == "et" || ls.getSymCour () == "ou")
   {
     ls.suivant ();
-    //return true;
   }
   else
-   // return false;
     erreur ("<opBool>");
 }
+
+
 
 void
 LecteurPhraseSimple::opRel ()
