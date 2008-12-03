@@ -23,7 +23,7 @@ public:
   }				// accesseur
   inline void setValeur (int valeur)
   {
-    this->valeur = valeur;
+   this->valeur = valeur;
     defini = true;
   }				// accesseur
   inline bool estDefini ()
@@ -35,7 +35,7 @@ public:
 
 private:
   bool defini;			// indique si la valeur du symbole est définie
-  int valeur;			// valeur du symbole si elle est définie, zéro sinon
+  int valeur;// valeur du symbole si elle est définie, zéro sinon
 
 };
 

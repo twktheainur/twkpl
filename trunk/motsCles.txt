@@ -24,3 +24,8 @@ tantque
 fintantque
 repeter
 jusqua
+finsi
+lire
+ecrire
+pour
+finpour

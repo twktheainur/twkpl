@@ -4,7 +4,7 @@
 #include <string>
 using namespace std;
 
-int
+/*int
 main (int argc, char *argv[])
 {
   string nomFich;
@@ -20,3 +20,4 @@ main (int argc, char *argv[])
   LecteurPhraseSimple lp (nomFich);
   lp.analyse ();
 }
+*/

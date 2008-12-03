@@ -26,13 +26,29 @@ private:
   TableSymboles ts;		// la table des symboles valués
 
   // implémentation de la grammaire
-  void programme ();		//   <programme> ::= debut <seqInst> fin <EOF>
-  void seqInst ();		//     <seqIns>  ::= <inst> ; { <inst> ; }
-  void inst ();			//        <inst> ::= <affectation>
-  void affectation ();		// <affectation> ::= <variable> = <expression>
-  void expression ();		//  <expression> ::= <facteur> { <opBinaire> <facteur> }
-  void facteur ();		//     <facteur> ::= <entier>  |  <variable>  |  - <facteur>  |  ( <expression> )
-  void opBinaire ();		//   <opBinaire> ::= + | - | *  | /
+  void programme ();             //   <programme> ::= debut <seqInst> fin <EOF>
+   void seqInst ();              //     <seq_ins> ::= <inst> ; { <inst> ; }
+   void inst ();                 //        <inst> ::= <affectation>
+   void affectation ();          // <affectation> ::= <variable> = <expression>
+   void expression ();           //  <expression> ::= <facteur> { <opBinaire> <facteur> }
+   void facteur ();              //     <facteur> ::= <entier>  |  <variable>  |  - <facteur>  |  ( <expression> )
+   void terme ();                // <terme> ::= <facteur> { <opAdd> <facteur> }
+   //void opBinaire ();          //  <opBinaire>  ::= + | - | *  | /
+   void opAdd ();                // <opAdd>  ::= + | -
+   void opMult ();               // <opMult>  ::=  *  | /
+   void opBool ();
+   void relation ();
+   void opRel ();
+   void expBool ();
+   void opUnaire ();
+
+   void instSi();
+   void instTq();
+   void instRepeter();
+   void instPour();
+
+   void instLire();
+   void instEcrire();
 
   // outils pour se simplifier l'analyse syntaxique
   void testerSymCour (string ch);	// si symbole courant != ch, erreur : on arrete le programme, sinon rien
