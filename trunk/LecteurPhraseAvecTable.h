@@ -26,7 +26,7 @@ private:
   TableSymboles ts;		// la table des symboles valués
 
   // implémentation de la grammaire
-  void programme ();             //   <programme> ::= debut <seqInst> fin <EOF>
+   void programme ();             //   <programme> ::= debut <seqInst> fin <EOF>
    void seqInst ();              //     <seq_ins> ::= <inst> ; { <inst> ; }
    void inst ();                 //        <inst> ::= <affectation>
    void affectation ();          // <affectation> ::= <variable> = <expression>

@@ -2,7 +2,7 @@
 using namespace std;
 #include "LecteurPhraseAvecTable.h"
 
-int
+/*int
 main (int argc, char *argv[])
 {
   char nomFich[255];
@@ -19,3 +19,4 @@ main (int argc, char *argv[])
   lp.analyse ();		// on lance l'analyse
   cout << lp.getTs ();		// on affiche la table des symboles
 }
+*/

@@ -78,6 +78,7 @@ public:
   }				// à cause du destructeur virtuel de la classe Noeud
   int getValeur ();		// évalue l'operande gauche, l'operande droit et applique l'opérateur
   void afficher (unsigned short indentation = 0);	// affiche l'opération
+  inline Symbole getSymbole(){return operateur;}
 
 private:
   Symbole operateur;
@@ -85,4 +86,92 @@ private:
   Noeud *operandeDroit;
 };
 
+////////////////////////////////////////////////////////////////////////////////
+class NoeudOperateurUnaire:public Noeud
+{
+// classe pour représenter un noeud "opération arithmétique" composé d'un opérateur (+-*/)
+// et de 2 fils : l'opérande gauche et l'opérande droit
+public:
+  NoeudOperateurUnaire (Symbole operateur,Noeud * operandeDroit);
+  // construit une opération binaire : operandeGauche operateur OperandeDroit
+  ~NoeudOperateurUnaire ()
+  {
+  }                             // à cause du destructeur virtuel de la classe Noeud
+  int getValeur ();             // évalue l'operande gauche, l'operande droit et applique l'opérateur
+  void afficher (unsigned short indentation = 0);       // affiche l'opération
+
+private:
+  Symbole operateur;
+  Noeud *operandeGauche;
+};
+
+class NoeudSi:public Noeud
+{
+public:
+  NoeudSi (Noeud *condition,Noeud * seqVrai, Noeud * seqFaux);
+  ~NoeudSi()
+  {
+  }
+  int getValeur ();
+  void afficher (unsigned short indentation = 0);
+
+private:
+  Noeud *condition;
+  Noeud *seqVrai;
+  Noeud *siFaux;
+};
+
+class NoeudBoucle:public Noeud
+{
+public:
+  NoeudBoucle (Noeud *condition,Noeud * seq);
+  ~NoeudBoucle()
+  {
+  }
+  virtual int getValeur ()=0;
+  void afficher (unsigned short indentation = 0);
+  inline Noeud* getCondition(){return condition;}
+  inline Noeud* getSeq(){return seq;}
+private:
+  Noeud *condition;
+  Noeud *seq;
+};
+
+class NoeudTantque:public NoeudBoucle
+{
+public:
+  NoeudTantque (Noeud *condition,Noeud * seq);
+  ~NoeudTantque()
+  {
+  }
+  int getValeur ();
+  void afficher (unsigned short indentation = 0);
+};
+class NoeudRepeter:public NoeudBoucle
+{
+public:
+  NoeudRepeter(Noeud *condition,Noeud * seq);
+  ~NoeudRepeter()
+  {
+  }
+  int getValeur ();
+  void afficher (unsigned short indentation = 0);
+};
+
+/*class NoeudPour:public NoeudBoucle
+{
+public:
+  NoeudPour(Noeud *condition,Noeud * seq,int debut,int fin)
+  {
+    this->init=init;
+    this->affectation=affectation;
+  }
+  ~NoeudPour()
+  {
+  }
+  int getValeur ();
+  void afficher (unsigned short indentation = 0);
+  int debut;
+  int fin;
+};*/
 #endif /* ARBRE_H_ */
