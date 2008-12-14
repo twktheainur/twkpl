@@ -170,6 +170,8 @@ LecteurPhraseSimple::instSi()
         expBool();
         sauterSymCour(")");
       }
+    else
+      erreur("si");
     seqInst();
     while(ls.getSymCour ()=="sinonsi")
       {

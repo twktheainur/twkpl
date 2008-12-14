@@ -22,7 +22,8 @@ private:
   void inst ();			//        <inst> ::= <affectation>
   void affectation ();		// <affectation> ::= <variable> = <expression>
   void expression ();		//  <expression> ::= <facteur> { <opBinaire> <facteur> }
-  void facteur ();		//     <facteur> ::= <entier>  |  <variable>  |  - <facteur>  |  ( <expression> )
+  void facteur ();		// <entier> | <variable> | <opUnaire> <expBool> | ( <expBool> )
+
   void terme ();		// <terme> ::= <facteur> { <opAdd> <facteur> }
   //void opBinaire ();          //  <opBinaire>  ::= + | - | *  | /
   void opAdd ();		// <opAdd>  ::= + | -

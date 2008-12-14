@@ -23,7 +23,7 @@ public:
   inline TableSymboles getTs ()
   {
     return ts;
-  }				// accesseur 
+  }				// accesseur
   inline Noeud *getArbre ()
   {
     return arbre;
@@ -41,8 +41,14 @@ private:
   Noeud *inst ();		//        <inst> ::= <affectation>
   Noeud *affectation ();	// <affectation> ::= <variable> = <expression>
   Noeud *expression ();		//  <expression> ::= <facteur> { <opBinaire> <facteur> }
-  Noeud *facteur ();		//     <facteur> ::= <entier>  |  <variable>  |  - <facteur>  |  ( <expression> )
-  Symbole opBinaire ();		//   <opBinaire> ::= + | - | *  | / 
+  Noeud *facteur ();	        //<entier> | <variable> | <opUnaire> <expBool> | ( <expBool> )
+  Noeud *expBool();
+  Noeud *terme ();                // <terme> ::= <facteur> { <opAdd> <facteur> }
+  Noeud *relation ();              //<relation> ::= <expression> {<opRel> <expression>}
+  Symbole opBinaire ();		//   <opBinaire> ::= + | - | *  | /
+  Symbole opUnaire ();
+
+  Noeud * instSi(bool rec=0);
 
   // outils pour se simplifier l'analyse syntaxique
   void testerSymCour (string ch);	// si symbole courant != ch, erreur : on arrete le programme, sinon rien
