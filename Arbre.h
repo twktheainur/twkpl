@@ -158,20 +158,22 @@ public:
   void afficher (unsigned short indentation = 0);
 };
 
-/*class NoeudPour:public NoeudBoucle
+class NoeudPour:public NoeudBoucle
 {
 public:
-  NoeudPour(Noeud *condition,Noeud * seq,int debut,int fin)
+  NoeudPour(Noeud *condition,Noeud * seq,Noeud * affect,Noeud * init)
+  : NoeudBoucle(condition,seq)
   {
+    this->affectation = affect;
     this->init=init;
-    this->affectation=affectation;
   }
   ~NoeudPour()
   {
   }
   int getValeur ();
   void afficher (unsigned short indentation = 0);
-  int debut;
-  int fin;
-};*/
+private:
+  Noeud * affectation;
+  Noeud * init;
+};
 #endif /* ARBRE_H_ */
