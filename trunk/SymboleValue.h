@@ -17,7 +17,7 @@ public:
   {
   }
   void afficher (unsigned short indentation = 0);	// affiche le symbole en tant que noeud de l'arbre
-  inline int getValeur ()
+  template <class T> inline T getValeur ()
   {
     return valeur;
   }				// accesseur
@@ -35,7 +35,7 @@ public:
 
 private:
   bool defini;			// indique si la valeur du symbole est définie
-  int valeur;// valeur du symbole si elle est définie, zéro sinon
+   valeur;// valeur du symbole si elle est définie, zéro sinon
 
 };
 

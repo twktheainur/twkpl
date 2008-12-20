@@ -61,17 +61,20 @@ LecteurPhraseAvecArbre::inst ()
       return affectation ();
     }
   else if(ls.getSymCour () == "si")
-      return instSi();
-  else if(ls.getSymCour () == "tantque");
-    //return instTq();
-  else if(ls.getSymCour () == "repeter");
-    //return instRepeter();
+    return instSi();
+  else if(ls.getSymCour () == "tantque")
+    return instTq();
+  else if(ls.getSymCour () == "repeter")
+    return instRepeter();
+  else if(ls.getSymCour () == "pour")
+    return instPour();
+  else
+    return NULL;
   //else if(ls.getSymCour () == "lire")
     //instLire();
   //else if(ls.getSymCour () == "ecrire")
-    //instEcrire();
-
-//  return affectation ();
+    //instEcrire()
+  
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -162,7 +165,7 @@ LecteurPhraseAvecArbre::facteur ()
 
   Noeud *fact = NULL;
 
-  if (ls.getSymCour () == "<VARIABLE>" || ls.getSymCour () == "<ENTIER>")
+  if (ls.getSymCour () == "<VARIABLE>" || ls.getSymCour () == "<ENTIER>"||ls.getSymCour () == "<CHAINE>")
     {
       fact = ts.chercheAjoute (ls.getSymCour ());
       ls.suivant ();
@@ -191,9 +194,9 @@ LecteurPhraseAvecArbre::instSi(bool rec)
 //  [ sinon <seqInst> ] finsi
 
 
-    Noeud * cond;
-    Noeud * seqVrai;
-    Noeud * siFaux;
+    Noeud * cond=NULL;
+    Noeud * seqVrai=NULL;
+    Noeud * siFaux=NULL;
     if(ls.getSymCour ()=="si" || (rec && ls.getSymCour ()=="sinonsi"))
       {
         ls.suivant();
@@ -204,22 +207,84 @@ LecteurPhraseAvecArbre::instSi(bool rec)
             sauterSymCour(")");
           }
         seqVrai=seqInst();
-        siFaux=instSi(true);
-      }
-    else if(rec && ls.getSymCour ()=="sinon")
-      {
-        ls.suivant();
-        siFaux=seqInst();
-      }
-    else
-      {
-        siFaux=new NoeudSeqInst();
-        sauterSymCour("finsi");
+        if(ls.getSymCour ()=="sinon")
+          {
+            ls.suivant();
+            siFaux=seqInst();
+            sauterSymCour("finsi");
+          }
+        else if(ls.getSymCour ()=="sinonsi")
+          siFaux=instSi(true);
+        else
+          {
+            siFaux=new NoeudSeqInst();
+            sauterSymCour("finsi");
+          }
       }
     return new NoeudSi(cond,seqVrai,siFaux);
 }
 ////////////////////////////////////////////////////////////////////////////////
 
+Noeud *
+LecteurPhraseAvecArbre::instTq()
+{
+  //<instTq> ::= tantque ( <expBool> ) <seqInst> fintantque
+  Noeud * nexpBool=NULL;
+  Noeud * nseqInst=NULL;
+    sauterSymCour("tantque");
+    if(ls.getSymCour ()=="(")
+      {
+        ls.suivant();
+        nexpBool = expBool();
+        sauterSymCour(")");
+      }
+    nseqInst = seqInst();
+    sauterSymCour("fintantque");
+    return new NoeudTantque(nexpBool,nseqInst);
+}
+
+Noeud *
+LecteurPhraseAvecArbre::instRepeter()
+{
+  //<instTq> ::= repeter <seqInst>  tantque ( <expBool> )
+  Noeud * nexpBool=NULL;
+  Noeud * nseqInst=NULL;
+    sauterSymCour("repeter");
+    nseqInst = seqInst();
+    sauterSymCour("tantque");
+    if(ls.getSymCour ()=="(")
+      {
+        ls.suivant();
+        nexpBool = expBool();
+        sauterSymCour(")");
+      }
+    return new NoeudRepeter(nexpBool,nseqInst);
+}
+
+
+Noeud *
+LecteurPhraseAvecArbre::instPour()
+{
+  //<instPour> ::= pour (<affectation>;<expBool>;<affectation>>  ) <seqInst> finpour
+  Noeud * init=NULL;
+  Noeud * affect=NULL;
+  Noeud * condition=NULL;
+  Noeud * seq;
+    sauterSymCour("pour");
+    if(ls.getSymCour ()=="(")
+      {
+        ls.suivant();
+        init=affectation();
+        sauterSymCour(";");
+        condition = expBool();
+        sauterSymCour(";");
+        affect = affectation();
+        sauterSymCour(")");
+      }
+    seq = seqInst();
+    sauterSymCour("fintantque");
+    return new NoeudPour(init,condition,affect,seq);
+}
 ////////////////////////////////////////////////////////////////////////////////
 Symbole LecteurPhraseAvecArbre::opBinaire ()
 {
