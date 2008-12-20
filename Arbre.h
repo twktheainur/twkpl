@@ -161,7 +161,7 @@ public:
 class NoeudPour:public NoeudBoucle
 {
 public:
-  NoeudPour(Noeud *condition,Noeud * seq,Noeud * affect,Noeud * init)
+  NoeudPour(Noeud * init,Noeud *condition,Noeud * affect,Noeud * seq)
   : NoeudBoucle(condition,seq)
   {
     this->affectation = affect;

@@ -49,6 +49,9 @@ private:
   Symbole opUnaire ();
 
   Noeud * instSi(bool rec=0);
+  Noeud * instTq();
+  Noeud * instRepeter();
+  Noeud * instPour();
 
   // outils pour se simplifier l'analyse syntaxique
   void testerSymCour (string ch);	// si symbole courant != ch, erreur : on arrete le programme, sinon rien

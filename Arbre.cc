@@ -186,7 +186,13 @@ int NoeudSi::getValeur ()
 }
 void NoeudSi::afficher (unsigned short indentation )
 {
- cout << "On a fait un supersi!" << endl;
+  cout << "Noeud - Operateur Si:"<<endl;
+  this->condition->afficher (indentation);
+  cout << "Si Vrai:" << endl;
+  this->seqVrai->afficher (indentation +1);
+  cout << "siFaux" << endl;
+  this->siFaux->afficher(indentation+1);
+  cout <<endl;
 }
 ////////////////////////////////////////////////////////////////////////////////
 // NoeudBoucle
@@ -198,7 +204,7 @@ NoeudBoucle::NoeudBoucle (Noeud *condition,Noeud * seq)
 }
 void NoeudBoucle::afficher (unsigned short indentation )
 {
-  cout << "Boucle";
+  cout << "Noeud Boucle";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -206,19 +212,23 @@ void NoeudBoucle::afficher (unsigned short indentation )
 ////////////////////////////////////////////////////////////////////////////////
 NoeudRepeter::NoeudRepeter (Noeud *condition,Noeud * seq)
 :NoeudBoucle(condition,seq){}
-void NoeudRepeter::afficher (unsigned short indentation)
-{
-  cout << "Repeter" << endl;
-}
 int NoeudRepeter::getValeur()
 {
   int valeur=0;
   do
     {
-      valeur+=getSeq()->getValeur();
+      valeur=getSeq()->getValeur();
     }
   while(getCondition()->getValeur());
   return valeur;
+}
+
+void NoeudRepeter::afficher (unsigned short indentation )
+{
+  NoeudBoucle::afficher(indentation);
+  cout << "Noeud Repeter" << endl;
+  this->getCondition()->afficher(indentation);
+  this->getSeq()->afficher(indentation+1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -233,38 +243,35 @@ int NoeudTantque::getValeur()
   int valeur=0;
   while(getCondition()->getValeur())
     {
-      valeur+=getSeq()->getValeur();
+      valeur=getSeq()->getValeur();
     }
   return valeur;
 }
 void NoeudTantque::afficher (unsigned short indentation )
 {
   NoeudBoucle::afficher();
-  cout << "Tantque" << endl;
+  cout << "Noeud Tantque" << endl;
+  this->getCondition()->afficher(indentation);
+  this->getSeq()->afficher(indentation+1);
 }
 
-/*////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // NoeudPour
 ////////////////////////////////////////////////////////////////////////////////
-NoeudPour::NoeudPour(Noeud *condition,Noeud * seq,Noeud * init, Noeud * affectation)
-{
-  this->init=init;
-  this->affectation=affectation;
-}
 
 int NoeudPour::getValeur()
 {
   int valeur=0;
   int i;
-  for(i=init->getValeur();getCondition()->getValeur();i=affectation.getValeur())
-    {
-      valeur+=getSeq()->getValeur();
-    }
+ for(getCondition()->getValeur();getCondition()->getValeur();affectation->getValeur())
+ {
+   valeur=getSeq()->getValeur();
+ }
   return valeur;
 }
 void NoeudPour::afficher (unsigned short indentation )
 {
   NoeudPour::afficher();
-  cout << "Tantque" << endl;
+  
 }
-*/
+
