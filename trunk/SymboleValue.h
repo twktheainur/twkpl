@@ -1,41 +1,54 @@
-#ifndef SYMBOLEVALUE_H
-#define SYMBOLEVALUE_H
+#ifndef SYMBOLEVALUE_H_
+#define SYMBOLEVALUE_H_
 
-#include <string.h>
+#include <cstring>
 #include <iostream>
+#include <typeinfo>
 using namespace std;
-
 #include "Symbole.h"
 #include "Arbre.h"
 
-class SymboleValue:public Symbole,	// un symbole valué est un symbole qui a une valeur, définie ou pas
-  public Noeud
-{				// et c'est aussi une feuille de l'arbre abstrait
+class SymboleValue:public Noeud,public Symbole
+{
 public:
-  SymboleValue (Symbole s);	// construit un symbole valué à partir d'un symbole existant s
-  ~SymboleValue ()
+  SymboleValue(Symbole s,Type * val=NULL)
+  :Symbole(s.getChaine ())
   {
+  	//if(val==NULL)
+   //   defini = false;
+  	//else
+  		defini=false;
+    valeur=val;
+  };
+  inline string getType()
+  {
+  	if(valeur)
+  	  return valeur->getType();
+  	else
+      throw Exception();
   }
-  void afficher (unsigned short indentation = 0);	// affiche le symbole en tant que noeud de l'arbre
-  template <class T> inline T getValeur ()
+
+  inline Type * getValeur()
   {
     return valeur;
-  }				// accesseur
-  inline void setValeur (int valeur)
+  }
+  inline void setValeur(Type * val)
   {
-   this->valeur = valeur;
-    defini = true;
-  }				// accesseur
+    valeur=val;
+    defini=true;
+  }
+
+  void afficher(unsigned short indentation);
   inline bool estDefini ()
   {
     return defini;
-  }				// accesseur
-
-  friend ostream & operator << (ostream & cout, SymboleValue symb);	// affiche un symbole value sur cout
-
+  }
+  //friend ostream & operator <<(std::basic_ostream<char, std::char_traits<char> >& cout, SymboleValue symb);
+  void disp();
 private:
-  bool defini;			// indique si la valeur du symbole est définie
-   valeur;// valeur du symbole si elle est définie, zéro sinon
+  bool defini;  	// indique si la valeur du symbole est définie
+  Type * valeur;
+
 
 };
 

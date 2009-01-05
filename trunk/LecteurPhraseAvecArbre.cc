@@ -23,13 +23,51 @@ Noeud *
 LecteurPhraseAvecArbre::programme ()
 {
   // <programme> ::= debut <seq_inst> fin FIN_FICHIER
-
+  Noeud * decl=NULL;
+  if(ls.getSymCour()=="declarer")
+  {
+    ls.suivant();
+    decl = declaration();
+  }
+  cout << "before deb"<<endl;
   sauterSymCour ("debut");
+  cout << "after deb"<<endl;
   Noeud *si = seqInst ();
   sauterSymCour ("fin");
   testerSymCour ("<FINDEFICHIER>");
-  return si;
+  return new NoeudProgramme(decl,si);
 }
+////////////////////////////////////////////////////////////////////////////////
+Noeud * LecteurPhraseAvecArbre::declaration()
+{
+	//<declaration>::= {<TYPE>:<VARIABLE>;}
+  NoeudDeclaration * nd = new NoeudDeclaration();
+  string type;
+  string name;
+  Symbole var;
+  while(ls.getSymCour()=="<VARIABLE>")
+  {
+  	var= ls.getSymCour();
+  	name=var.getChaine();
+  	ls.suivant();
+  	sauterSymCour (":");
+  	type=ls.getSymCour().getChaine();
+  	cout << type;
+  	if(type=="Entier"||
+  		 type=="Chaine"||
+  		 type=="Bool"||
+  		 type=="Reel")
+  		ls.suivant();
+  	else
+  		sauterSymCour ("<VARIABLE>");
+  	ts.chercheAjoute(var,type);
+    nd->ajouteDeclaration(name,type);
+  	sauterSymCour (";");
+  }
+  return nd;
+}
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 Noeud *
@@ -57,7 +95,8 @@ LecteurPhraseAvecArbre::inst ()
 // <inst> ::= <affectation> | <inst_condi>
   if(ls.getSymCour () == "<VARIABLE>")
     {
-      ts.chercheAjoute (ls.getSymCour ());
+  	  cout <<ls.getSymCour ().getChaine();
+      ts.cherche(ls.getSymCour ());
       return affectation ();
     }
   else if(ls.getSymCour () == "si")
@@ -74,7 +113,7 @@ LecteurPhraseAvecArbre::inst ()
     //instLire();
   //else if(ls.getSymCour () == "ecrire")
     //instEcrire()
-  
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -88,6 +127,16 @@ LecteurPhraseAvecArbre::affectation ()
   ls.suivant ();
   sauterSymCour ("=");
   Noeud *exp = expression ();
+  //Type * t1 =var->getValeur();
+  //Type * t2 =exp->getValeur();
+ // string st1=t1->getType();
+ // string st2=t2->getType();
+  //cout <<st1<<"=="<<st2<<endl;
+  //if(st1!=st2)
+  //{
+  //	cout <<"ho!"<<endl;
+  //	throw new ExTypeMismatch(var->getValeur()->getType(),exp->getValeur()->getType());
+  //}
   return new NoeudAffectation (var, exp);
 }
 
@@ -167,7 +216,16 @@ LecteurPhraseAvecArbre::facteur ()
 
   if (ls.getSymCour () == "<VARIABLE>" || ls.getSymCour () == "<ENTIER>"||ls.getSymCour () == "<CHAINE>")
     {
-      fact = ts.chercheAjoute (ls.getSymCour ());
+
+
+      if(ls.getSymCour()=="<VARIABLE>")
+      {
+      	fact = ts.cherche(ls.getSymCour ());
+      }
+      else
+      {
+      	fact = ts.chercheAjoute (ls.getSymCour ());
+      }
       ls.suivant ();
     }
   else if (ls.getSymCour () == "-" || ls.getSymCour () == "non")
@@ -184,7 +242,7 @@ LecteurPhraseAvecArbre::facteur ()
       sauterSymCour (")");
     }
   else
-    erreur ("<facteur>");
+    erreur (E_SYNTAX,"<facteur>");
   return fact;
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -302,7 +360,7 @@ Symbole LecteurPhraseAvecArbre::opBinaire ()
     }
   else
     {
-      erreur ("<opBinaire>");
+      erreur (E_SYNTAX,"<opBinaire>");
     }
   return operateur;
 }
@@ -316,7 +374,7 @@ Symbole LecteurPhraseAvecArbre::opUnaire ()
       ls.suivant();
     }
   else
-    erreur("<opUnaire>");
+    erreur(E_SYNTAX,"<opUnaire>");
   return operateur;
 
 }
@@ -327,10 +385,7 @@ LecteurPhraseAvecArbre::testerSymCour (string ch)
 {
   if (ls.getSymCour () != ch)
     {
-      cout << endl << "-------- Erreur ligne " << ls.getLigne ()
-	<< " - Colonne " << ls.getColonne () << endl << "   Attendu : "
-	<< ch << endl << "   Trouve  : " << ls.getSymCour () << endl << endl;
-      exit (0);			// plus tard, on levera une exception
+      throw new ExSyntaxError(ch,ls.getSymCour().getChaine(),ls.getLigne(),ls.getColonne());
     }
 }
 
@@ -344,10 +399,15 @@ LecteurPhraseAvecArbre::sauterSymCour (string ch)
 
 ////////////////////////////////////////////////////////////////////////////////
 void
-LecteurPhraseAvecArbre::erreur (string mess)
+LecteurPhraseAvecArbre::erreur (ExType_t type,string msg,string msg1)
 {
-  cout << endl << "-------- Erreur ligne " << ls.getLigne () << " - Colonne "
-    << ls.getColonne () << endl << "   Attendu : " << mess << endl
-    << "   Trouve  : " << ls.getSymCour () << endl << endl;
-  exit (0);			// plus tard, on levera une exception
+	int line=ls.getLigne ();
+	int col=ls.getColonne();
+  switch(type)
+  {
+  	case E_UNHANDLED: throw new Exception(line,col);break;
+  	case E_SYNTAX: throw new ExSyntaxError(ls.getSymCour().getChaine(),msg,line,col);break;
+  	case E_UNDEFVAR:throw new ExVarUndef(msg,line,col);break;
+  	case E_TYPE: throw new ExTypeMismatch(msg,msg1,line,col);break;
+  }
 }

@@ -37,9 +37,13 @@ private:
 
   // implémentation de la grammaire
   Noeud *programme ();		//   <programme> ::= debut <seqInst> fin FIN_FICHIER
+  string type();          // <type>::=<ENTIER>|<CHAINE>
+  Noeud *declaration();    // <declaration> ::=<type>:<variable>
   Noeud *seqInst ();		//     <seqInst> ::= <inst> ; { <inst> ; }
   Noeud *inst ();		//        <inst> ::= <affectation>
   Noeud *affectation ();	// <affectation> ::= <variable> = <expression>
+
+
   Noeud *expression ();		//  <expression> ::= <facteur> { <opBinaire> <facteur> }
   Noeud *facteur ();	        //<entier> | <variable> | <opUnaire> <expBool> | ( <expBool> )
   Noeud *expBool();
@@ -56,7 +60,7 @@ private:
   // outils pour se simplifier l'analyse syntaxique
   void testerSymCour (string ch);	// si symbole courant != ch, erreur : on arrete le programme, sinon rien
   void sauterSymCour (string ch);	// si symbole courant == ch, on passe au symbole suivant, sinon erreur : on arrete
-  void erreur (string mess);	// affiche les message d'erreur mess et arrete le programme
+  void erreur (ExType_t type,string msg="",string msg1="");// affiche les message d'erreur mess et jette une exception
 };
 
 #endif /* LECTEURPHRASEAVECARBRE_H_ */

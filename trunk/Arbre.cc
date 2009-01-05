@@ -1,80 +1,154 @@
 #include <stdlib.h>
 #include "Arbre.h"
-#include "Symbole.h"
 #include "SymboleValue.h"
+#include <typeinfo>
+
+////////////////////////////////////////////////////////////////////////////////
+// NoeudDeclaration
+////////////////////////////////////////////////////////////////////////////////
+
+NoeudDeclaration::NoeudDeclaration() : mapDecl()
+{
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+Type *
+NoeudDeclaration::getValeur()
+{
+	cout << "eval decl"<<endl;
+  int size = mapDecl.size();
+  Entier * res = new Entier();
+  res->setValeur((void *) (&size));
+
+  return res;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void
+NoeudDeclaration::afficher(unsigned short indentation)
+{
+  Noeud::afficher(indentation);
+  cout << "Noeud - Sequence de " << mapDecl.size() << "Declaration(s)" <<
+    endl;
+  for (map<string, string>::iterator it = mapDecl.begin(); it != mapDecl.end(); it++)
+  {
+    cout << it->first << ":" << it->second;
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void
+NoeudDeclaration::ajouteDeclaration(string symbol, string type)
+{
+  mapDecl.insert(pair<string, string > (symbol, type));
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // NoeudSeqInst
 ////////////////////////////////////////////////////////////////////////////////
 
-NoeudSeqInst::NoeudSeqInst ():tabInst ()
+NoeudSeqInst::NoeudSeqInst() : tabInst()
 {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int
-NoeudSeqInst::getValeur ()
+
+Type *
+NoeudSeqInst::getValeur()
 {
-  int valeur = 0;
-  for (unsigned int i = 0; i < tabInst.size (); i++)
-    valeur = tabInst[i]->getValeur ();	// on evalue chaque instruction de la séquence
-  return valeur;		// par convention, resultat = valeur de la derniere instruction
+	cout << "eval seqInst"<<endl;
+  Type * valeur=NULL;
+  for (unsigned int i = 0; i < tabInst.size(); i++)
+    valeur = tabInst[i]->getValeur(); // on evalue chaque instruction de la séquence
+  return valeur; // par convention, resultat = valeur de la derniere instruction
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+
 void
-NoeudSeqInst::afficher (unsigned short indentation)
+NoeudSeqInst::afficher(unsigned short indentation)
 {
-  Noeud::afficher (indentation);
-  cout << "Noeud - Sequence de " << tabInst.size () << " instruction(s)" <<
+  Noeud::afficher(indentation);
+  cout << "Noeud - Sequence de " << tabInst.size() << " instruction(s)" <<
     endl;
-  for (unsigned int i = 0; i < tabInst.size (); i++)
-    tabInst[i]->afficher (indentation + 1);	// on affiche les fils en augmentant l'indentation
+  for (unsigned int i = 0; i < tabInst.size(); i++)
+    tabInst[i]->afficher(indentation + 1); // on affiche les fils en augmentant l'indentation
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+
 void
-NoeudSeqInst::ajouteInstruction (Noeud * instruction)
+NoeudSeqInst::ajouteInstruction(Noeud * instruction)
 {
-  tabInst.push_back (instruction);
+  tabInst.push_back(instruction);
+}
+////////////////////////////////////////////////////////////////////////////////
+// NoeudAffectation
+////////////////////////////////////////////////////////////////////////////////
+Type *
+NoeudProgramme::getValeur()
+{
+	cout << "eval prog"<<endl;
+  this->seqDecl->getValeur();
+  return this->seqInst->getValeur();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void
+NoeudProgramme::afficher(unsigned short indentation)
+{
+  Noeud::afficher(indentation);
+  cout << "Noeud - Programme" << endl;
+  seqDecl->afficher(indentation + 1); // on affiche variable et expression
+  seqInst->afficher(indentation + 1); // en augmentant l'indentation
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // NoeudAffectation
 ////////////////////////////////////////////////////////////////////////////////
 
-NoeudAffectation::NoeudAffectation (Noeud * variable, Noeud * expression)
+NoeudAffectation::NoeudAffectation(Noeud * variable, Noeud * expression)
 {
   this->variable = variable;
   this->expression = expression;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int
-NoeudAffectation::getValeur ()
+
+Type *
+NoeudAffectation::getValeur()
 {
-  int valeur = expression->getValeur ();	// on évalue l'expression
-  ((SymboleValue *) variable)->setValeur (valeur);	// on affecte la variable
-  return valeur;		// par convention, une affectation a pour valeur la valeur affectée
+	cout << "eval affec"<<endl;
+  SymboleValue * svvar = (SymboleValue *) variable;
+  Type * eval = expression->getValeur(); // on évalue l'expression
+  svvar->setValeur(eval);
+  return eval;
+  // par convention, une affectation a pour valeur la valeur affectée
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+
 void
-NoeudAffectation::afficher (unsigned short indentation)
+NoeudAffectation::afficher(unsigned short indentation)
 {
-  Noeud::afficher (indentation);
+  Noeud::afficher(indentation);
   cout << "Noeud - Affectation" << endl;
-  variable->afficher (indentation + 1);	// on affiche variable et expression
-  expression->afficher (indentation + 1);	// en augmentant l'indentation
+  variable->afficher(indentation + 1); // on affiche variable et expression
+  expression->afficher(indentation + 1); // en augmentant l'indentation
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // NoeudOperateurBinaire
 ////////////////////////////////////////////////////////////////////////////////
 
-NoeudOperateurBinaire::NoeudOperateurBinaire (Symbole operateur,
-					      Noeud * operandeGauche,
-					      Noeud * operandeDroit)
+NoeudOperateurBinaire::NoeudOperateurBinaire(Symbole operateur,
+                                             Noeud * operandeGauche,
+                                             Noeud * operandeDroit)
 {
   this->operateur = operateur;
   this->operandeGauche = operandeGauche;
@@ -82,196 +156,366 @@ NoeudOperateurBinaire::NoeudOperateurBinaire (Symbole operateur,
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int
-NoeudOperateurBinaire::getValeur ()
+
+Type *
+NoeudOperateurBinaire::getValeur()
 {
-  int valeur = 0;
-  int og = operandeGauche->getValeur ();
-  int od = operandeDroit->getValeur ();
-  if (this->operateur == "+")
-    valeur = og + od;
-  else if (this->operateur == "-")
-    valeur = og - od;
-  else if (this->operateur == "*")
-    valeur = og * od;
-  else if (this->operateur == "et")
-      valeur = og && od;
-  else if (this->operateur == "ou")
-      valeur = og || od;
-  else if (this->operateur == "==")
-      valeur = og == od;
-  else if (this->operateur == "!=")
-      valeur = og != od;
-  else if (this->operateur == ">")
-        valeur = og > od;
-  else if (this->operateur == "<")
-        valeur = og < od;
-  else if (this->operateur == ">=")
-        valeur = og >= od;
-  else if (this->operateur == "<=")
-        valeur = og <= od;
-  else if(this->operateur == "/")
+	cout << "eval opbin"<<endl;
+  Type * valeur=NULL;
+  Type * og = operandeGauche->getValeur();
+  Type * od = operandeDroit->getValeur();
+  if (this->operateur == "+" ||
+    this->operateur == "-" ||
+    this->operateur == "*" ||
+    this->operateur == "/")
+  {
+    if (og->getType() == "<ENTIER>")
     {
-      if (od != 0)
-        valeur = og / od;
-      else
-        {
-          cout << "Erreur pendant l'interpretation : division par zero" << endl;
-          exit (0);			// plus tard on levera une exception
-        }
+      void * valg;
+      void * vald;
+      int resval;
+      og->getValeur(&valg);
+      od->getValeur(&vald);
+      valeur = new Entier();
+      if (this->operateur == "+")
+        resval = *((int *) valg) + *((int *) vald);
+      else if (this->operateur == "-")
+        resval = *((int *) valg) - *((int *) vald);
+      else if (this->operateur == "*")
+        resval = *((int *) valg) * *((int *) vald);
+      else if (this->operateur == "/")
+      {
+        if (*((int *) vald) != 0)
+          resval = *((int *) valg) / *((int *) vald);
+        //else
+        //TODO:throw something here
+      }
+      valeur->setValeur(&resval);
     }
+    else if (og->getType() == "<REEL>")
+    {
+      void * valg;
+      void * vald;
+      float resval;
+      og->getValeur(&valg);
+      od->getValeur(&vald);
+      valeur = new Reel();
+      if (this->operateur == "+")
+        resval = *((float *) valg) + *((float *) vald);
+      else if (this->operateur == "-")
+        resval = *((float *) valg) - *((float *) vald);
+      else if (this->operateur == "*")
+        resval = *((float *) valg) * *((float *) vald);
+      else if (this->operateur == "/")
+      {
+        if (*((float *) vald) != 0)
+          resval = *((float *) valg) / *((float *) vald);
+        //else
+        //TODO:throw something here
+      }
+      valeur->setValeur(&resval);
+    }
+    else if (og->getType() == "<CHAINE>" && this->operateur == "+")
+    {
+      void * valg;
+      void * vald;
+      string resval;
+      og->getValeur(&valg);
+      od->getValeur(&vald);
+      valeur = new Chaine();
+      resval = *((string *) valg) + *((string *) vald);
+      valeur->setValeur(&resval);
+    }
+  }
+  else
+  {
+    bool resval;
+    void * valg;
+    void *vald;
+    og->getValeur(&valg);
+    od->getValeur(&vald);
+    cout << this->getType() <<":";
+    cout << *(int *)valg;
+    cout << this->operateur.getChaine();
+    cout << *(int *)vald<<endl;
+
+    valeur = new Entier();
+    if (this->operateur == "et")
+      resval = *((int*)valg) && *((int*)vald);
+    else if (this->operateur == "ou")
+      resval = *((int*)valg) || *((int*)vald);
+    else if (this->operateur == "==")
+    {
+      if (og->getType() == "<ENTIER>")
+        resval = *((int*) valg) == *((int*) vald);
+      else if (og->getType() == "<REEL>")
+        resval = *((float*) valg) == *((float*) vald);
+      else if (og->getType() == "<CHAINE>")
+        resval = *((string*) valg) == *((string*) vald);
+    }
+    else if (this->operateur == "!=")
+    {
+    	cout << "=="<<endl;
+      if (og->getType() == "<ENTIER>")
+        resval = *((int*) valg) != *((int*) vald);
+      else if (og->getType() == "<REEL>")
+        resval = *((float*) valg) != *((float*) vald);
+      else if (og->getType() == "<CHAINE>")
+        resval = *((string*) valg) != *((string*) vald);
+    }
+
+    else if (this->operateur == ">")
+    {
+      if (og->getType() == "<ENTIER>")
+        resval = *((int*) valg) > *((int*) vald);
+      else if (og->getType() == "<REEL>")
+        resval = *((float*) valg) > *((float*) vald);
+      else if (og->getType() == "<CHAINE>")
+        resval = *((string*) valg) > *((string*) vald);
+    }
+    else if (this->operateur == "<")
+    {
+      if (og->getType() == "<ENTIER>")
+        resval = *((int*) valg)< *((int*) vald);
+      else if (og->getType() == "<REEL>")
+        resval = *((float*) valg) < *((float*) vald);
+      else if (og->getType() == "<CHAINE>")
+        resval = *((string*) valg) < *((string*) vald);
+    }
+    else if (this->operateur == ">=")
+    {
+      if (og->getType() == "<ENTIER>")
+        resval = *((int*) valg) >= *((int*) vald);
+      else if (og->getType() == "<REEL>")
+        resval = *((float*) valg) >= *((float*) vald);
+      else if (og->getType() == "<CHAINE>")
+        resval = *((string*) valg) >= *((string*) vald);
+      else if (og->getType() == "<BOOL>")
+        resval = *((bool*)valg) >= *((bool*)vald);
+    }
+    else if (this->operateur == "<=")
+    {
+      if (og->getType() == "<ENTIER>")
+        resval = *((int*) valg)< *((int*) vald);
+      else if (og->getType() == "<REEL>")
+        resval = *((float*) valg) < *((float*) vald);
+      else if (og->getType() == "<CHAINE>")
+        resval = *((string*) valg) < *((string*) vald);
+      else if (og->getType() == "<BOOL>")
+        resval = *((bool*)valg) < *((bool*)vald);
+    }
+    valeur->setValeur(&resval);
+  }
   return valeur;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+
 void
-NoeudOperateurBinaire::afficher (unsigned short indentation)
+NoeudOperateurBinaire::afficher(unsigned short indentation)
 {
-  Noeud::afficher (indentation);
+  Noeud::afficher(indentation);
   cout << "Noeud - Operateur Binaire \"" << this->
-    operateur.getChaine () << "\" applique a : " << endl;
-  operandeGauche->afficher (indentation + 1);	// on affiche fils gauche et fils droit
-  operandeDroit->afficher (indentation + 1);	// en augmentant l'indentation
+    operateur.getChaine() << "\" applique a : " << endl;
+  operandeGauche->afficher(indentation + 1); // on affiche fils gauche et fils droit
+  operandeDroit->afficher(indentation + 1); // en augmentant l'indentation
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // NoeudOperateurBinaire
 ////////////////////////////////////////////////////////////////////////////////
 
-NoeudOperateurUnaire::NoeudOperateurUnaire (Symbole operateur,
-                                              Noeud * operandeGauche)
+NoeudOperateurUnaire::NoeudOperateurUnaire(Symbole operateur,
+                                           Noeud * operandeGauche)
 {
   this->operateur = operateur;
   this->operandeGauche = operandeGauche;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int
-NoeudOperateurUnaire::getValeur ()
+
+Type *
+NoeudOperateurUnaire::getValeur()
 {
-  int valeur = 0;
-  int og = operandeGauche->getValeur ();
+	cout << "eval opun"<<endl;
+  Type * valeur=NULL;
+  Type * og = operandeGauche->getValeur();
+  void * val;
+  og->getValeur(&val);
   if (this->operateur == "-")
-    valeur =-og;
+  {
+    if (og->getType() == "<ENTIER>")
+    {
+      valeur = new Entier();
+      *((int *) val) = -*((int *) val);
+    }
+    else if (og->getType() == "<REEL>")
+    {
+      valeur = new Reel();
+      *((float *) val) = -*((float *)val);
+    }
+    else
+      throw new ExTypeMismatch(string(string(typeid (Entier).name()) + " ou " + string(typeid (Reel).name())), typeid (og).name());
+  }
   else if (this->operateur == "non")
-    valeur = !og;
+  {
+    if (og->getType() == "<ENTIER>")
+    {
+      valeur = new Entier();
+      *((float *) val) = -*((float *)val);
+    }
+    else
+      throw new ExTypeMismatch(string(string(typeid (Entier).name()) + " ou " + string(typeid (Reel).name())), typeid (og).name());
+  }
+  valeur->setValeur(&val);
   return valeur;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+
 void
-NoeudOperateurUnaire::afficher (unsigned short indentation)
+NoeudOperateurUnaire::afficher(unsigned short indentation)
 {
-  Noeud::afficher (indentation);
+  Noeud::afficher(indentation);
   cout << "Noeud - Operateur Unaire \"" << this->
-    operateur.getChaine () << "\" applique a : " << endl;
-  operandeGauche->afficher (indentation + 1);   // on affiche fils gauche et fils droit
+    operateur.getChaine() << "\" applique a : " << endl;
+  operandeGauche->afficher(indentation + 1); // on affiche fils gauche et fils droit
 }
 ////////////////////////////////////////////////////////////////////////////////
 // NoeudSi
 ////////////////////////////////////////////////////////////////////////////////
-NoeudSi::NoeudSi (Noeud *condition,Noeud * seqVrai, Noeud * siFaux)
+
+NoeudSi::NoeudSi(Noeud *condition, Noeud * seqVrai, Noeud * siFaux)
 {
-  this->condition=condition;
-  this->seqVrai=seqVrai;
-  this->siFaux=siFaux;
+  this->condition = condition;
+  this->seqVrai = seqVrai;
+  this->siFaux = siFaux;
 }
 
-int NoeudSi::getValeur ()
+Type * NoeudSi::getValeur()
 {
-  if(condition->getValeur())
-    return seqVrai->getValeur();
+	cout << "eval si"<<endl;
+  void * val;
+  if (condition->getType() == "<BOOL>" || condition->getType() == "<ENTIER>")
+  {
+    condition->getValeur()->getValeur(&val);
+    if (*((bool *)val))
+      return seqVrai->getValeur();
+    else
+      return siFaux->getValeur();
+  }
   else
-    return siFaux->getValeur();
+    throw new ExTypeMismatch("<BOOL>|<ENTIER>",condition->getType());
 }
-void NoeudSi::afficher (unsigned short indentation )
+
+void NoeudSi::afficher(unsigned short indentation)
 {
-  cout << "Noeud - Operateur Si:"<<endl;
-  this->condition->afficher (indentation);
+  cout << "Noeud - Operateur Si:" << endl;
+  this->condition->afficher(indentation);
   cout << "Si Vrai:" << endl;
-  this->seqVrai->afficher (indentation +1);
+  this->seqVrai->afficher(indentation + 1);
   cout << "siFaux" << endl;
-  this->siFaux->afficher(indentation+1);
-  cout <<endl;
+  this->siFaux->afficher(indentation + 1);
+  cout << endl;
 }
 ////////////////////////////////////////////////////////////////////////////////
 // NoeudBoucle
 ////////////////////////////////////////////////////////////////////////////////
-NoeudBoucle::NoeudBoucle (Noeud *condition,Noeud * seq)
+
+NoeudBoucle::NoeudBoucle(Noeud *condition, Noeud * seq)
 {
-  this->condition=condition;
-  this->seq=seq;
+  this->condition = condition;
+  this->seq = seq;
 }
-void NoeudBoucle::afficher (unsigned short indentation )
+
+void NoeudBoucle::afficher(unsigned short indentation)
 {
+  indentation++;
   cout << "Noeud Boucle";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // NoeudBoucle
 ////////////////////////////////////////////////////////////////////////////////
-NoeudRepeter::NoeudRepeter (Noeud *condition,Noeud * seq)
-:NoeudBoucle(condition,seq){}
-int NoeudRepeter::getValeur()
+
+NoeudRepeter::NoeudRepeter(Noeud *condition, Noeud * seq)
+: NoeudBoucle(condition, seq)
 {
-  int valeur=0;
+}
+
+Type *
+NoeudRepeter::getValeur()
+{
+  Type * valeur;
+  void * val;
   do
-    {
-      valeur=getSeq()->getValeur();
-    }
-  while(getCondition()->getValeur());
+  {
+    getCondition()->getValeur()->getValeur(&val);
+    valeur = getSeq()->getValeur();
+  }
+  while (*((int *)val));
   return valeur;
 }
 
-void NoeudRepeter::afficher (unsigned short indentation )
+void NoeudRepeter::afficher(unsigned short indentation)
 {
   NoeudBoucle::afficher(indentation);
   cout << "Noeud Repeter" << endl;
   this->getCondition()->afficher(indentation);
-  this->getSeq()->afficher(indentation+1);
+  this->getSeq()->afficher(indentation + 1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // NoeudTantque
 ////////////////////////////////////////////////////////////////////////////////
-NoeudTantque::NoeudTantque (Noeud *condition,Noeud * seq)
-:NoeudBoucle(condition,seq)
-{}
 
-int NoeudTantque::getValeur()
+NoeudTantque::NoeudTantque(Noeud *condition, Noeud * seq)
+: NoeudBoucle(condition, seq)
 {
-  int valeur=0;
-  while(getCondition()->getValeur())
-    {
-      valeur=getSeq()->getValeur();
-    }
+}
+
+Type * NoeudTantque::getValeur()
+{
+  Type * valeur;
+  void * val;
+  getCondition()->getValeur()->getValeur(&val);
+  while (*((int *)val))
+  {
+  	cout << *((int *)val);
+    valeur = getSeq()->getValeur();
+    getCondition()->getValeur()->getValeur(&val);
+  }
   return valeur;
 }
-void NoeudTantque::afficher (unsigned short indentation )
+
+void NoeudTantque::afficher(unsigned short indentation)
 {
   NoeudBoucle::afficher();
   cout << "Noeud Tantque" << endl;
   this->getCondition()->afficher(indentation);
-  this->getSeq()->afficher(indentation+1);
+  this->getSeq()->afficher(indentation + 1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // NoeudPour
 ////////////////////////////////////////////////////////////////////////////////
 
-int NoeudPour::getValeur()
+Type * NoeudPour::getValeur()
 {
-  int valeur=0;
-  int i;
- for(getCondition()->getValeur();getCondition()->getValeur();affectation->getValeur())
- {
-   valeur=getSeq()->getValeur();
- }
+  Type * valeur=NULL;
+  void * cond;
+  this->getCondition()->getValeur()->getValeur(&cond);
+  for (init->getValeur(); *((int *)cond); affectation->getValeur())
+  {
+    valeur = getSeq()->getValeur();
+  }
   return valeur;
 }
-void NoeudPour::afficher (unsigned short indentation )
+
+void NoeudPour::afficher(unsigned short indentation)
 {
+  indentation++;
   NoeudPour::afficher();
-  
+
 }
 
