@@ -7,36 +7,43 @@
 
 #include "Type.h"
 //Accesseurs Entier
-  void Entier::getValeur(void ** val)
-  {
-    void * tmp = &valeur;
-    *val = tmp;
-  }
-  void Entier::setValeur(void * val)
-  {
-    valeur=*((int *)val);
-  }
+
+void Entier::getValeur(void ** val)
+{
+  void * tmp = &valeur;
+  *val = tmp;
+}
+
+void Entier::setValeur(void * val)
+{
+  valeur = *((int *) val);
+}
 //Accesseurs Chaine
-  void Chaine::getValeur(void ** val)
-  {
-    void * tmp = &valeur;
-    val = &tmp;
-  }
-  void Chaine::setValeur(void * val)
-  {
-  	cout << "STRING!:"<<*((string *)val)<<endl;
-    valeur=*((string *)val);
-  }
+
+void Chaine::getValeur(void ** val)
+{
+  void * tmp = &valeur;
+  val = &tmp;
+}
+
+void Chaine::setValeur(void * val)
+{
+  cout << "STRING!:" << *((string *) val) << endl;
+  valeur = *((string *) val);
+  cout << "STRING!:" <<valeur << endl;
+}
 //Accesseurs Reels
-  void Reel::getValeur(void ** val)
-  {
-    void * tmp = &valeur;
-    val = &tmp;
-  }
-  void Reel::setValeur(void * val)
-  {
-    valeur=*((float *)val);
-  }
+
+void Reel::getValeur(void ** val)
+{
+  void * tmp = &valeur;
+  val = &tmp;
+}
+
+void Reel::setValeur(void * val)
+{
+  valeur = *((float *) val);
+}
 
 //  void Bool::getValeur(void ** val)
 //  {
@@ -49,22 +56,24 @@
 //  }
 
 //Operateurs de flux pour chaque type
-ostream & operator<<(ostream & cout,Chaine* ch)
+
+ostream & operator<<(ostream & cout, Chaine* ch)
 {
   void * val;
   ch->getValeur(&val);
-  return cout << *((string *)val);
-}
-ostream & operator<<(ostream & cout,Entier* ch)
-{
-  void * val;
-  ch->getValeur(&val);
-  return cout << *((int *)val);
+  return cout << *((string *) val);
 }
 
-ostream & operator<<(ostream & cout,Reel* ch)
+ostream & operator<<(ostream & cout, Entier* ch)
 {
   void * val;
   ch->getValeur(&val);
-  return cout << *((float *)val);
+  return cout << *((int *) val);
+}
+
+ostream & operator<<(ostream & cout, Reel* ch)
+{
+  void * val;
+  ch->getValeur(&val);
+  return cout << *((float *) val);
 }
