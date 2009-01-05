@@ -16,7 +16,11 @@ main (int argc, char *argv[])
     strncpy (nomFich, argv[1], sizeof (nomFich));
 
   LecteurPhraseAvecArbre lp (nomFich);
-  lp.analyse ();
+  try
+  {
+    lp.analyse ();
+
+
   cout << endl << "Arbre Abstrait : " << endl;
   cout << "================" << endl;
   lp.getArbre ()->afficher ();
@@ -24,5 +28,17 @@ main (int argc, char *argv[])
   cout << endl << "Evaluation de l'arbre (interpretation)..." << endl;
   lp.getArbre ()->getValeur ();
   cout << endl << "Table des symboles apres evaluation : " << lp.getTs ();
+  }
+  catch(Exception * e)
+   {
+     cout << "Caught an exception:"<<e->what()<<endl;
+   	delete e;
+   }
+	//Type * toto = new Entier();
+//	int valeur = 10;
+//	toto->setValeur(&valeur);
+//	void * val;
+//	toto->getValeur(&val);
+//	cout << *((int *)val);
   return 0;
 }

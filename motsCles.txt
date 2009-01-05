@@ -1,5 +1,11 @@
+procedure
+function
+declarer
+Entier
+Chaine
 debut
 fin
+:
 (
 )
 +

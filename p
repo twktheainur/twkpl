@@ -1,4 +1,8 @@
 # commentaire
+declarer
+  i:Entier;
+  j:Entier;
+  z:Chaine;
 debut
 #hey
 #fuck!
@@ -10,12 +14,12 @@ debut
   j=i;
   j=j+1;
  fintantque; 
- si (i<5)
-    i=10;
+ si (i!=5)
+    i=i+j;
   sinonsi (i==10)
-   i=2;
+   i=-j;
   sinon
-    i=9;
+    i=666;
   finsi; 
 fin
 
