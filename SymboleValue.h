@@ -43,6 +43,10 @@ public:
   {
     return defini;
   }
+  inline void definir()
+  {
+  	defini=true;
+  }
   //friend ostream & operator <<(std::basic_ostream<char, std::char_traits<char> >& cout, SymboleValue symb);
   void disp();
 private:

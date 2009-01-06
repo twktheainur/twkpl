@@ -199,6 +199,40 @@ private:
   Noeud *siFaux;
 };
 
+class NoeudLire : public Noeud
+{
+public:
+  NoeudLire(Noeud *facteur);
+  ~NoeudLire()
+  {
+  }
+  inline string getType()
+  {
+  	return facteur->getType();
+  }
+  Type * getValeur();
+  void afficher(unsigned short indentation = 0);
+private:
+  Noeud *facteur;
+};
+
+class NoeudEcrire : public Noeud
+{
+public:
+  NoeudEcrire(Noeud *facteur);
+  ~NoeudEcrire()
+  {
+  }
+  inline string getType()
+  {
+  	return facteur->getType();
+  }
+  Type * getValeur();
+  void afficher(unsigned short indentation = 0);
+private:
+  Noeud *facteur;
+};
+
 class NoeudBoucle : public Noeud
 {
 public:

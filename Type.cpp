@@ -23,21 +23,19 @@ void Entier::setValeur(void * val)
 void Chaine::getValeur(void ** val)
 {
   void * tmp = &valeur;
-  val = &tmp;
+  *val = tmp;
 }
 
 void Chaine::setValeur(void * val)
 {
-  cout << "STRING!:" << *((string *) val) << endl;
   valeur = *((string *) val);
-  cout << "STRING!:" <<valeur << endl;
 }
 //Accesseurs Reels
 
 void Reel::getValeur(void ** val)
 {
   void * tmp = &valeur;
-  val = &tmp;
+  *val = tmp;
 }
 
 void Reel::setValeur(void * val)

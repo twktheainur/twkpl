@@ -32,9 +32,7 @@ LecteurPhraseAvecArbre::programme()
     ls.suivant();
     decl = declaration();
   }
-  cout << "before deb" << endl;
   sauterSymCour("debut");
-  cout << "after deb" << endl;
   Noeud *si = seqInst();
   sauterSymCour("fin");
   testerSymCour("<FINDEFICHIER>");
@@ -56,11 +54,10 @@ Noeud * LecteurPhraseAvecArbre::declaration()
     ls.suivant();
     sauterSymCour(":");
     type = ls.getSymCour().getChaine();
-    cout << type;
     if (type == "Entier" ||
-            type == "Chaine" ||
-            type == "Bool" ||
-            type == "Reel")
+      type == "Chaine" ||
+      type == "Bool" ||
+      type == "Reel")
       ls.suivant();
     else
       sauterSymCour("<VARIABLE>");
@@ -87,8 +84,8 @@ LecteurPhraseAvecArbre::seqInst()
     sauterSymCour(";");
   }
   while (ls.getSymCour() == "<VARIABLE>" || ls.getSymCour() == "si" ||
-          ls.getSymCour() == "tantque" || ls.getSymCour() == "repeter" ||
-          ls.getSymCour() == "lire" || ls.getSymCour() == "ecrire");
+    ls.getSymCour() == "tantque" || ls.getSymCour() == "repeter" ||
+    ls.getSymCour() == "lire" || ls.getSymCour() == "ecrire");
   // tant que le symbole courant est un debut possible d'instruction...
   return si;
 }
@@ -101,7 +98,6 @@ LecteurPhraseAvecArbre::inst()
   // <inst> ::= <affectation> | <inst_condi>
   if (ls.getSymCour() == "<VARIABLE>")
   {
-    cout << ls.getSymCour().getChaine();
     ts.cherche(ls.getSymCour());
     return affectation();
   }
@@ -113,13 +109,12 @@ LecteurPhraseAvecArbre::inst()
     return instRepeter();
   else if (ls.getSymCour() == "pour")
     return instPour();
+  else if(ls.getSymCour () == "lire")
+    return instLire();
+  else if(ls.getSymCour () == "ecrire")
+    return instEcrire();
   else
     return NULL;
-  //else if(ls.getSymCour () == "lire")
-  //instLire();
-  //else if(ls.getSymCour () == "ecrire")
-  //instEcrire()
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -206,8 +201,8 @@ LecteurPhraseAvecArbre::relation()
 
   Noeud *fact = expression();
   while (ls.getSymCour() == "==" || ls.getSymCour() == "!=" ||
-          ls.getSymCour() == "<" || ls.getSymCour() == ">" ||
-          ls.getSymCour() == "<=" || ls.getSymCour() == ">=")
+    ls.getSymCour() == "<" || ls.getSymCour() == ">" ||
+    ls.getSymCour() == "<=" || ls.getSymCour() == ">=")
   {
     Symbole operateur = opBinaire(); // on stocke le symbole de l'opérateur
     Noeud *factDroit = relation(); // lecture de l'operande droit
@@ -225,10 +220,8 @@ LecteurPhraseAvecArbre::facteur()
 
   Noeud *fact = NULL;
 
-  if (ls.getSymCour() == "<VARIABLE>" || ls.getSymCour() == "<ENTIER>" || ls.getSymCour() == "<CHAINE>")
+  if (ls.getSymCour() == "<VARIABLE>" || ls.getSymCour() == "<ENTIER>" || ls.getSymCour() == "<CHAINE>" || ls.getSymCour() == "<REEL>")
   {
-
-
     if (ls.getSymCour() == "<VARIABLE>")
     {
       fact = ts.cherche(ls.getSymCour());
@@ -244,7 +237,7 @@ LecteurPhraseAvecArbre::facteur()
     ls.suivant();
     // on représente le moins unaire (- facteur) par une soustractin binaire (0 - facteur)
     fact =
-            new NoeudOperateurUnaire(ls.getSymCour(), expBool());
+      new NoeudOperateurUnaire(ls.getSymCour(), expBool());
   }
   else if (ls.getSymCour() == "(")
   {
@@ -253,7 +246,10 @@ LecteurPhraseAvecArbre::facteur()
     sauterSymCour(")");
   }
   else
+  {
+    cout <<"biatch!"<<endl;
     erreur(E_SYNTAX, "<facteur>");
+  }
   return fact;
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -355,17 +351,60 @@ LecteurPhraseAvecArbre::instPour()
   return new NoeudPour(init, condition, affect, seq);
 }
 ////////////////////////////////////////////////////////////////////////////////
+Noeud *
+LecteurPhraseAvecArbre::instLire()
+{
+  //<instLire> ::= lire(<variable>|<entier>|<reel>|chaine)
+	Noeud * fact;
+	sauterSymCour("lire");
+	  if (ls.getSymCour() == "(")
+	  {
+	    ls.suivant();
+	    if (ls.getSymCour() == "<VARIABLE>" || ls.getSymCour() == "<ENTIER>" || ls.getSymCour() == "<CHAINE>" || ls.getSymCour() == "<REEL>")
+	    {
+	      if (ls.getSymCour() == "<VARIABLE>")
+	      {
+	        fact = ts.cherche(ls.getSymCour());
+	      }
+	      else
+	      {
+	        fact = ts.chercheAjoute(ls.getSymCour());
+	      }
+	      ls.suivant();
+	    }
+	    sauterSymCour(")");
+	  }
+	  else
+	  erreur(E_TYPE,"<VARIABLE>|<ENTIER>|<CHAINE>|<REEL>");
+  return new NoeudLire(fact);
+}
+////////////////////////////////////////////////////////////////////////////////
+Noeud *
+LecteurPhraseAvecArbre::instEcrire()
+{
+  //<instEcrire> ::= ecrire(<facteur>)
+	Noeud * fact;
+	sauterSymCour("ecrire");
+	  if (ls.getSymCour() == "(")
+	  {
+	    ls.suivant();
+	    fact = facteur();
+	    sauterSymCour(")");
+	  }
+  return new NoeudEcrire(fact);
+}
+////////////////////////////////////////////////////////////////////////////////
 
 Symbole LecteurPhraseAvecArbre::opBinaire()
 {
   // <opBinaire> ::= + | - | *  | / | et | ou | == | != |< |>|<=|>=
   Symbole operateur;
   if (ls.getSymCour() == "+" || ls.getSymCour() == "-" ||
-          ls.getSymCour() == "*" || ls.getSymCour() == "/" ||
-          ls.getSymCour() == "et" || ls.getSymCour() == "ou" ||
-          ls.getSymCour() == "==" || ls.getSymCour() == "!=" ||
-          ls.getSymCour() == "<" || ls.getSymCour() == ">" ||
-          ls.getSymCour() == "<=" || ls.getSymCour() == ">=")
+    ls.getSymCour() == "*" || ls.getSymCour() == "/" ||
+    ls.getSymCour() == "et" || ls.getSymCour() == "ou" ||
+    ls.getSymCour() == "==" || ls.getSymCour() == "!=" ||
+    ls.getSymCour() == "<" || ls.getSymCour() == ">" ||
+    ls.getSymCour() == "<=" || ls.getSymCour() == ">=")
   {
     operateur = ls.getSymCour();
     ls.suivant();
@@ -420,13 +459,13 @@ LecteurPhraseAvecArbre::erreur(ExType_t type, string msg, string msg1)
   int col = ls.getColonne();
   switch (type)
   {
-  case E_UNHANDLED: throw new Exception(line, col);
-    break;
-  case E_SYNTAX: throw new ExSyntaxError(ls.getSymCour().getChaine(), msg, line, col);
-    break;
-  case E_UNDEFVAR:throw new ExVarUndef(msg, line, col);
-    break;
-  case E_TYPE: throw new ExTypeMismatch(msg, msg1, line, col);
-    break;
+    case E_UNHANDLED: throw new Exception(line, col);
+      break;
+    case E_SYNTAX: throw new ExSyntaxError(msg,ls.getSymCour().getChaine(),line, col);
+      break;
+    case E_UNDEFVAR:throw new ExVarUndef(msg, line, col);
+      break;
+    case E_TYPE: throw new ExTypeMismatch(msg, msg1, line, col);
+      break;
   }
 }
