@@ -570,6 +570,7 @@ Type * NoeudPour::getValeur()
   for (init->getValeur(); *((int *)cond); affectation->getValeur())
   {
     valeur = getSeq()->getValeur();
+    this->getCondition()->getValeur()->getValeur(&cond);
   }
   return valeur;
 }
@@ -577,7 +578,7 @@ Type * NoeudPour::getValeur()
 void NoeudPour::afficher(unsigned short indentation)
 {
   indentation++;
-  NoeudPour::afficher();
+  NoeudBoucle::afficher();
 
 }
 
