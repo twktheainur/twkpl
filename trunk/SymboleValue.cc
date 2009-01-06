@@ -21,12 +21,12 @@ void SymboleValue::disp()
   	void * vald;
   	Type * toto =getValeur();
   	toto->getValeur(&vald);
-  	if (dynamic_cast<Entier*>(toto))
-  	       cout<<"i:"<< *((int*) vald);
-  	else if (dynamic_cast<Reel*>(toto))
-  	        cout<<"f:" << *((float*) vald);
-  	else if (dynamic_cast<Chaine*>(toto))
-  	        cout<<"s:"<< *((string*) vald);
+  	if (toto->getType()=="<ENTIER>")
+  	       cout<<"Entier:"<< *((int*) vald);
+  	else if (toto->getType()=="<REEL>")
+  	        cout<<"Reel:" << *((float*)vald);
+  	else if (toto->getType()=="<CHAINE>")
+  	        cout<<"Chaine:"<< *((string*) vald);
     cout << " ";
   }
   else

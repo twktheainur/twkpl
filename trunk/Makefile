@@ -1,4 +1,4 @@
-GCC = g++ -Wall -W -O
+GCC = g++ -Wall -W -O -g3
 all: TestLecteurPhraseAvecArbre
 
 ######################################################################################################
@@ -16,7 +16,9 @@ LecteurPhraseAvecArbre.o: LecteurPhraseAvecArbre.cc LecteurPhraseAvecArbre.h Sym
 TestLecteurPhraseAvecArbre.o: TestLecteurPhraseAvecArbre.cc LecteurPhraseAvecArbre.h
 	$(GCC) -c TestLecteurPhraseAvecArbre.cc
 	
-	
 TestLecteurPhraseAvecArbre: $(ObjTestLecteurPhraseAvecArbre)
 	$(GCC) -o TestLecteurPhraseAvecArbre $(ObjTestLecteurPhraseAvecArbre)
+clean:
+	rm *.o
+	rm  TestLecteurPhraseAvecArbre
 	

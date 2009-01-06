@@ -2,6 +2,7 @@
 declarer
   i:Entier;
   j:Entier;
+  p:Reel;
   z:Chaine;
 debut
 #hey
@@ -9,6 +10,12 @@ debut
   i=5;
   j=10;
   z="I am really pissed off now!";
+  ecrire(i);
+  ecrire(i);
+  ecrire(i);
+  ecrire("saisissez p:");
+  lire(p);
+  ecrire("p:");ecrire(p);
  tantque (i<10)
   i=i+1;
   j=i;

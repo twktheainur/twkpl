@@ -57,6 +57,9 @@ private:
   Noeud * instRepeter();
   Noeud * instPour();
 
+  Noeud * instLire();
+  Noeud * instEcrire();
+
   // outils pour se simplifier l'analyse syntaxique
   void testerSymCour (string ch);	// si symbole courant != ch, erreur : on arrete le programme, sinon rien
   void sauterSymCour (string ch);	// si symbole courant == ch, on passe au symbole suivant, sinon erreur : on arrete

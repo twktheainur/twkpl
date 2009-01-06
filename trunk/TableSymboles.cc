@@ -47,7 +47,6 @@ TableSymboles::chercheAjoute (Symbole  s,string vtype)
         str>>val;
         svv=new Reel();
         svv->setValeur(&val);
-//        cout <<"float"<<endl;
     }
     else if(s=="<VARIABLE>")
     {
