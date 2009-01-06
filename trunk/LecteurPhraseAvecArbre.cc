@@ -85,6 +85,7 @@ LecteurPhraseAvecArbre::seqInst()
   }
   while (ls.getSymCour() == "<VARIABLE>" || ls.getSymCour() == "si" ||
     ls.getSymCour() == "tantque" || ls.getSymCour() == "repeter" ||
+    ls.getSymCour() == "pour"||
     ls.getSymCour() == "lire" || ls.getSymCour() == "ecrire");
   // tant que le symbole courant est un debut possible d'instruction...
   return si;
@@ -347,7 +348,7 @@ LecteurPhraseAvecArbre::instPour()
     sauterSymCour(")");
   }
   seq = seqInst();
-  sauterSymCour("fintantque");
+  sauterSymCour("finpour");
   return new NoeudPour(init, condition, affect, seq);
 }
 ////////////////////////////////////////////////////////////////////////////////
