@@ -27,6 +27,7 @@ si
 sinon
 sinonsi
 tantque
+tq
 fintantque
 repeter
 jusqua
