@@ -1,0 +1,70 @@
+Tchechmedjiev Andon A2
+
+TwkPl (Twk Programming Language)
+TwkPL is a high level interpreted language
+http://code.google.com/p/twkpl
+The changes made the the original code base are the following:
+  -Added a static typing system allowing the use of Strings(Chaine),
+   Integers(Entier), and floating point numbers(Reel)
+     -The syntax has been changed so that variables have to be declared in
+      a special block(declarer ... debut ... fin)
+      prior to their use within the program.
+      The variable declaration is done as follows:
+        name:Type;
+  -Added runtime type checking (basic semantic coherence check)
+  -Added Exceptions to handle errors instead of exit()s.
+   (Syntax Errors,Type Mismatch errors,Undefined Variables errors,
+    Division by zero errors)
+
+  Here is the syntax of TwkPL in BNF Form:
+	<programme>::=declarer <declaration >debut <seq_inst> fin FIN_FICHIER
+	<declaration>::= {<TYPE>:<VARIABLE>;}
+	<seqInst> ::= <inst> ; { <inst> ; }
+	<inst> ::= <affectation> | <instSi>|<instTantque>|<instRepeter>|<instPour>|<instLire>|<instEcrire>
+	<affectation> ::= <variable> = <expression>
+        <expression> ::= <facteur> { <opBinaire> <facteur> }
+	<facteur> ::= <entier>  |<chaine>|<reel>|  <variable>  |  - <facteur>  |  ( <expression> )
+	<terme> ::= <facteur> { <opAdd> <facteur> }
+	<relation> ::= <expression> {<opRel> <expression>}
+	<opBinaire> ::= + | - | *  | /
+	<opUnaire>::==-|non
+
+	<instSi> ::= si ( <expBool> ) <seqInst> { sinonsi ( <expBool> ) <seqInst> }
+		  [ sinon <seqInst> ] finsi
+	<instTq> ::= tantque ( <expBool> ) <seqInst> fintantque
+	<instTq> ::= repeter <seqInst>  tantque ( <expBool> )
+	<instPour> ::= pour (<affectation>;<expBool>;<affectation>>  ) <seqInst> finpour
+    <	instLire> ::= lire(<variable>|<entier>|<reel>|chaine)
+	<instEcrire> ::= ecrire(<facteur>)
+
+  Problems encountered during developpement:
+        The majors issues were encountered during the implementation of the
+    static typing system. Indeed at first I had decided to use a template based
+    solution;there was an abstract SymboleValue class, then there was a template
+    subclass(SymboleValueT) which contained the attribute used to store the value.
+    For each value there was a subclass of the template class of the following form:
+      class SymboleValueType: public SymboleValueT<Type>.
+        Unfortunately I rapidly discovered that polymorphism and templates did non
+    go along very well to say the least, for instance it is impossible to make
+    a template function virtual. 
+    In the end i figured that this approach was beyond my current level in c++,
+        I therefore started over with a regular regular polymorphic approach;
+     which used a Type * base class and a subclass per type.
+    Then the value attribute of each SymboleValue was replaced by a
+    Type * value attribute and all the getValeur methods were transformed to return
+    Type * as well.
+    Then the second major problem was to figure out how to write
+    getters and setter that would be of the same form for each subclass.
+    A stadard c++ solution would be to use templates, however due to my previous
+    failure to use templates in a polymorphic situation; I decided to use a pointer
+    reliant C-like solutions with void *s and void **s(for getters). Even
+    though this approach obfuscates the code quite a lot, it still remains
+    roughly readable by C aware programmers.
+    Also I found the use of typeid and dynamic_cast quite restrictive
+    and impractical, so I made a pure virtual getType method in
+    Type;and for each type its implementation returned the type as a string
+    (<ENTIER>,<REEL>,<CHAINE>). 
+    Furthermore in order to allow run-time type checking i also wrote a getType
+    for all the nodes,which makes sure,for a given node that there are no typing
+    incoherences( for instance comparing an integer and a string).
+

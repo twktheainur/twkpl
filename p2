@@ -1,0 +1,13 @@
+declarer
+  a:Chaine;
+  b:Chaine;
+  c:Chaine;
+debut
+  ecrire("chaine a:");
+  lire(a);
+  ecrire("chaine b:");
+  lire(b);
+  c=a+b;
+  ecrire("concatenation:");
+  ecrire(c);
+fin

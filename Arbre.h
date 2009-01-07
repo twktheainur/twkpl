@@ -113,7 +113,7 @@ class NoeudAffectation : public Noeud
 		inline string getType()
 		{
 			if(variable->getType()!=expression->getType())
-				throw ExTypeMismatch(variable->getType(),expression->getType());
+				throw new ExTypeMismatch(variable->getType(),expression->getType());
 			return variable->getType();
 		}
 		Type * getValeur(); // évalue l'expression et affecte sa valeur à la variable
@@ -169,12 +169,14 @@ class NoeudOperateurUnaire : public Noeud
 		// construit une opération binaire : operandeGauche operateur OperandeDroit
 		inline string getType()
 		{
-			if((operateur.getChaine()=="non"&&operandeGauche->getType()!="<ENTIER>")||
-				 (operateur.getChaine()=="-"&&(operandeGauche->getType()!="<ENTIER>"||operandeGauche->getType()!="<REEL>")))
+			if(operandeGauche->getType()!="<ENTIER>" ||(operandeGauche->getType()=="<REEL>" && operateur=="-"))
+			{
 				//Les booleens sont representes par des entiers
-				throw ExTypeMismatch("<ENTIER>|<REEL>",operandeGauche->getType());
+				cout <<"Dead!";
+				throw new ExTypeMismatch("<ENTIER>|<REEL>",operandeGauche->getType());
+			}
 			return operandeGauche->getType();
-		}//Retourne le type de l'operande.
+		}
 		~NoeudOperateurUnaire()
 		{
 		} // à cause du destructeur virtuel de la classe Noeud

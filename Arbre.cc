@@ -18,6 +18,14 @@ NoeudDeclaration::NoeudDeclaration() : mapDecl()
 Type *
 NoeudDeclaration::getValeur()
 {
+	try
+	{
+		this->getType();
+	}
+	catch(Exception * e)
+	{
+		throw;
+	}
 	int size = mapDecl.size();
 	Entier * res = new Entier();
 	res->setValeur((void *) (&size));
@@ -61,10 +69,18 @@ NoeudSeqInst::NoeudSeqInst() : tabInst()
 Type *
 NoeudSeqInst::getValeur()
 {
-	Type * valeur=NULL;
-	for (unsigned int i = 0; i < tabInst.size(); i++)
-		valeur = tabInst[i]->getValeur(); // on evalue chaque instruction de la séquence
-	return valeur; // par convention, resultat = valeur de la derniere instruction
+	try
+	{
+		this->getType();
+		Type * valeur=NULL;
+		for (unsigned int i = 0; i < tabInst.size(); i++)
+			valeur = tabInst[i]->getValeur(); // on evalue chaque instruction de la séquence
+		return valeur; // par convention, resultat = valeur de la derniere instruction
+	}
+	catch(Exception *e)
+	{
+		throw;
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -75,7 +91,7 @@ NoeudSeqInst::afficher(unsigned short indentation)
 	Noeud::afficher(indentation);
 	cout << "Noeud - Sequence de " << tabInst.size() << " instruction(s)" <<
 	endl;
-for (unsigned int i = 0; i < tabInst.size(); i++)
+	for (unsigned int i = 0; i < tabInst.size(); i++)
 		tabInst[i]->afficher(indentation + 1); // on affiche les fils en augmentant l'indentation
 }
 
@@ -92,8 +108,18 @@ NoeudSeqInst::ajouteInstruction(Noeud * instruction)
 Type *
 NoeudProgramme::getValeur()
 {
-	this->seqDecl->getValeur();
-	return this->seqInst->getValeur();
+	try
+	{
+		this->getType();
+		this->seqDecl->getValeur();
+		return this->seqInst->getValeur();
+	}
+	catch(Exception * e)
+	{
+		throw;
+	}
+
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -123,9 +149,18 @@ Type *
 NoeudAffectation::getValeur()
 {
 	SymboleValue * svvar = (SymboleValue *) variable;
-	Type * eval = expression->getValeur(); // on évalue l'expression
-	svvar->setValeur(eval);
-	return eval;
+	try
+	{
+		this->getType();
+
+		Type * eval = expression->getValeur(); // on évalue l'expression
+		svvar->setValeur(eval);
+		return eval;
+	}
+	catch(Exception * e)
+	{
+		throw;
+	}
 	// par convention, une affectation a pour valeur la valeur affectée
 }
 
@@ -158,153 +193,162 @@ NoeudOperateurBinaire::NoeudOperateurBinaire(Symbole operateur,
 Type *
 NoeudOperateurBinaire::getValeur()
 {
-	Type * valeur=NULL;
-	Type * og = operandeGauche->getValeur();
-	Type * od = operandeDroit->getValeur();
-	if (this->operateur == "+" ||
-			this->operateur == "-" ||
-			this->operateur == "*" ||
-			this->operateur == "/")
+	try
 	{
-		if (og->getType() == "<ENTIER>")
+		this->getType();
+		Type * valeur=NULL;
+		Type * og = operandeGauche->getValeur();
+		Type * od = operandeDroit->getValeur();
+		if (this->operateur == "+" ||
+				this->operateur == "-" ||
+				this->operateur == "*" ||
+				this->operateur == "/")
 		{
-			void * valg;
-			void * vald;
+			if (og->getType() == "<ENTIER>")
+			{
+				void * valg;
+				void * vald;
+				int resval;
+				og->getValeur(&valg);
+				od->getValeur(&vald);
+				valeur = new Entier();
+				if (this->operateur == "+")
+					resval = *((int *) valg) + *((int *) vald);
+				else if (this->operateur == "-")
+					resval = *((int *) valg) - *((int *) vald);
+				else if (this->operateur == "*")
+					resval = *((int *) valg) * *((int *) vald);
+				else if (this->operateur == "/")
+				{
+					if (*((int *) vald) != 0)
+						resval = *((int *) valg) / *((int *) vald);
+					else
+					  throw new ExDivZero();
+				}
+				valeur->setValeur(&resval);
+			}
+			else if (og->getType() == "<REEL>")
+			{
+				void * valg;
+				void * vald;
+				float resval;
+				og->getValeur(&valg);
+				od->getValeur(&vald);
+				valeur = new Reel();
+				if (this->operateur == "+")
+					resval = *((float *) valg) + *((float *) vald);
+				else if (this->operateur == "-")
+					resval = *((float *) valg) - *((float *) vald);
+				else if (this->operateur == "*")
+					resval = *((float *) valg) * *((float *) vald);
+				else if (this->operateur == "/")
+				{
+					if (*((float *) vald) != 0)
+						resval = *((float *) valg) / *((float *) vald);
+					else
+						 throw new ExDivZero();
+
+				}
+				valeur->setValeur(&resval);
+			}
+			else if (og->getType() == "<CHAINE>" && this->operateur == "+")
+			{
+				void * valg;
+				void * vald;
+				string resval;
+				og->getValeur(&valg);
+				od->getValeur(&vald);
+				valeur = new Chaine();
+				resval = *((string *) valg) + *((string *) vald);
+				valeur->setValeur(&resval);
+			}
+		}
+		else
+		{
 			int resval;
+			void * valg;
+			void *vald;
 			og->getValeur(&valg);
 			od->getValeur(&vald);
+			try
+			{
+				this->getType();
+			}
+			catch(ExTypeMismatch * e)
+			{
+				throw;
+			}
+
 			valeur = new Entier();
-			if (this->operateur == "+")
-				resval = *((int *) valg) + *((int *) vald);
-			else if (this->operateur == "-")
-				resval = *((int *) valg) - *((int *) vald);
-			else if (this->operateur == "*")
-				resval = *((int *) valg) * *((int *) vald);
-			else if (this->operateur == "/")
+			if (this->operateur == "et")
+				resval = *((int*)valg) && *((int*)vald);
+			else if (this->operateur == "ou")
+				resval = *((int*)valg) || *((int*)vald);
+			else if (this->operateur == "==")
 			{
-				if (*((int *) vald) != 0)
-					resval = *((int *) valg) / *((int *) vald);
-				//else
-				//TODO:throw something here
-			}
-			valeur->setValeur(&resval);
-		}
-		else if (og->getType() == "<REEL>")
-		{
-			void * valg;
-			void * vald;
-			float resval;
-			og->getValeur(&valg);
-			od->getValeur(&vald);
-			valeur = new Reel();
-			if (this->operateur == "+")
-				resval = *((float *) valg) + *((float *) vald);
-			else if (this->operateur == "-")
-				resval = *((float *) valg) - *((float *) vald);
-			else if (this->operateur == "*")
-				resval = *((float *) valg) * *((float *) vald);
-			else if (this->operateur == "/")
-			{
-				if (*((float *) vald) != 0)
-					resval = *((float *) valg) / *((float *) vald);
-				//else
-				//TODO:throw something here
-			}
-			valeur->setValeur(&resval);
-		}
-		else if (og->getType() == "<CHAINE>" && this->operateur == "+")
-		{
-			void * valg;
-			void * vald;
-			string resval;
-			og->getValeur(&valg);
-			od->getValeur(&vald);
-			valeur = new Chaine();
-			resval = *((string *) valg) + *((string *) vald);
-			valeur->setValeur(&resval);
-		}
-	}
-	else
-	{
-		int resval;
-		void * valg;
-		void *vald;
-		og->getValeur(&valg);
-		od->getValeur(&vald);
-		try
-		{
-			this->getType();
-		}
-		catch(ExTypeMismatch * e)
-		{
-			throw;
-		}
-
-		valeur = new Entier();
-		if (this->operateur == "et")
-			resval = *((int*)valg) && *((int*)vald);
-		else if (this->operateur == "ou")
-			resval = *((int*)valg) || *((int*)vald);
-		else if (this->operateur == "==")
-		{
-			if (og->getType() == "<ENTIER>")
-				resval = *((int*) valg) == *((int*) vald);
-			else if (og->getType() == "<REEL>")
-				resval = *((float*) valg) == *((float*) vald);
-			else if (og->getType() == "<CHAINE>")
-				resval = *((string*) valg) == *((string*) vald);
-		}
-		else if (this->operateur == "!=")
-		{
-			if (og->getType() == "<ENTIER>")
-				resval = *((int*) valg) != *((int*) vald);
-			else if (og->getType() == "<REEL>")
-				resval = *((float*) valg) != *((float*) vald);
-			else if (og->getType() == "<CHAINE>")
-				resval = *((string*) valg) != *((string*) vald);
-		}
-
-		else if (this->operateur == ">")
-		{
-			if (og->getType() == "<ENTIER>")
-				resval = *((int*) valg) > *((int*) vald);
+				if (og->getType() == "<ENTIER>")
+					resval = *((int*) valg) == *((int*) vald);
 				else if (og->getType() == "<REEL>")
-					resval = *((float*) valg) > *((float*) vald);
-					else if (og->getType() == "<CHAINE>")
-						resval = *((string*) valg) > *((string*) vald);
-		}
-		else if (this->operateur == "<")
-		{
-			if (og->getType() == "<ENTIER>")
-			{
-				resval = *((int*) valg)< *((int*) vald);
+					resval = *((float*) valg) == *((float*) vald);
+				else if (og->getType() == "<CHAINE>")
+					resval = *((string*) valg) == *((string*) vald);
 			}
-			else if (og->getType() == "<REEL>")
-				resval = *((float*) valg) < *((float*) vald);
-			else if (og->getType() == "<CHAINE>")
-				resval = *((string*) valg) < *((string*) vald);
+			else if (this->operateur == "!=")
+			{
+				if (og->getType() == "<ENTIER>")
+					resval = *((int*) valg) != *((int*) vald);
+				else if (og->getType() == "<REEL>")
+					resval = *((float*) valg) != *((float*) vald);
+				else if (og->getType() == "<CHAINE>")
+					resval = *((string*) valg) != *((string*) vald);
+			}
+
+			else if (this->operateur == ">")
+			{
+				if (og->getType() == "<ENTIER>")
+					resval = *((int*) valg) > *((int*) vald);
+					else if (og->getType() == "<REEL>")
+						resval = *((float*) valg) > *((float*) vald);
+						else if (og->getType() == "<CHAINE>")
+							resval = *((string*) valg) > *((string*) vald);
+			}
+			else if (this->operateur == "<")
+			{
+				if (og->getType() == "<ENTIER>")
+				{
+					resval = *((int*) valg)< *((int*) vald);
+				}
+				else if (og->getType() == "<REEL>")
+					resval = *((float*) valg) < *((float*) vald);
+				else if (og->getType() == "<CHAINE>")
+					resval = *((string*) valg) < *((string*) vald);
+			}
+			else if (this->operateur == ">=")
+			{
+				if (og->getType() == "<ENTIER>")
+					resval = *((int*) valg) >= *((int*) vald);
+				else if (og->getType() == "<REEL>")
+					resval = *((float*) valg) >= *((float*) vald);
+				else if (og->getType() == "<CHAINE>")
+					resval = *((string*) valg) >= *((string*) vald);
+			}
+			else if (this->operateur == "<=")
+			{
+				if (og->getType() == "<ENTIER>")
+					resval = *((int*) valg)< *((int*) vald);
+				else if (og->getType() == "<REEL>")
+					resval = *((float*) valg) < *((float*) vald);
+				else if (og->getType() == "<CHAINE>")
+					resval = *((string*) valg) < *((string*) vald);
+			}
+			valeur->setValeur(&resval);
 		}
-		else if (this->operateur == ">=")
-		{
-			if (og->getType() == "<ENTIER>")
-				resval = *((int*) valg) >= *((int*) vald);
-			else if (og->getType() == "<REEL>")
-				resval = *((float*) valg) >= *((float*) vald);
-			else if (og->getType() == "<CHAINE>")
-				resval = *((string*) valg) >= *((string*) vald);
-		}
-		else if (this->operateur == "<=")
-		{
-			if (og->getType() == "<ENTIER>")
-				resval = *((int*) valg)< *((int*) vald);
-			else if (og->getType() == "<REEL>")
-				resval = *((float*) valg) < *((float*) vald);
-			else if (og->getType() == "<CHAINE>")
-				resval = *((string*) valg) < *((string*) vald);
-		}
-		valeur->setValeur(&resval);
+		return valeur;
 	}
-	return valeur;
+	catch(Exception * e)
+	{
+		throw;
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -336,37 +380,46 @@ Type *
 NoeudOperateurUnaire::getValeur()
 {
 	//cout << "eval opun"<<endl;
-	Type * valeur=NULL;
-	Type * og = operandeGauche->getValeur();
-	void * val;
-	og->getValeur(&val);
-	if (this->operateur == "-")
+	try
 	{
-		if (og->getType() == "<ENTIER>")
+		this->getType();
+
+		Type * valeur=NULL;
+		Type * og = operandeGauche->getValeur();
+		void * val;
+		og->getValeur(&val);
+		if (this->operateur == "-")
 		{
-			valeur = new Entier();
-			*((int *) val) = -*((int *) val);
+			if (og->getType() == "<ENTIER>")
+			{
+				valeur = new Entier();
+				*((int *) val) = -*((int *) val);
+			}
+			else if (og->getType() == "<REEL>")
+			{
+				valeur = new Reel();
+				*((float *) val) = -*((float *)val);
+			}
+			else
+				throw new ExTypeMismatch(string(string(typeid (Entier).name()) + " ou " + string(typeid (Reel).name())), typeid (og).name());
 		}
-		else if (og->getType() == "<REEL>")
+		else if (this->operateur == "non")
 		{
-			valeur = new Reel();
-			*((float *) val) = -*((float *)val);
+			if (og->getType() == "<ENTIER>")
+			{
+				valeur = new Entier();
+				*((float *) val) = -*((float *)val);
+			}
+			else
+				throw new ExTypeMismatch(string(string(typeid (Entier).name()) + " ou " + string(typeid (Reel).name())), typeid (og).name());
 		}
-		else
-			throw new ExTypeMismatch(string(string(typeid (Entier).name()) + " ou " + string(typeid (Reel).name())), typeid (og).name());
+		valeur->setValeur(val);
+		return valeur;
 	}
-	else if (this->operateur == "non")
+	catch(Exception * e)
 	{
-		if (og->getType() == "<ENTIER>")
-		{
-			valeur = new Entier();
-			*((float *) val) = -*((float *)val);
-		}
-		else
-			throw new ExTypeMismatch(string(string(typeid (Entier).name()) + " ou " + string(typeid (Reel).name())), typeid (og).name());
+		throw;
 	}
-	valeur->setValeur(&val);
-	return valeur;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -394,18 +447,20 @@ Type * NoeudSi::getValeur()
 {
 
 	void * val;
+
 	try
 	{
+		this->getType();
 		condition->getValeur()->getValeur(&val);
-	}
-	catch (Exception * e)
-	{
-		throw;
-	}
 		if (*((int *)val))
 			return seqVrai->getValeur();
 		else
 			return siFaux->getValeur();
+	}
+	catch(Exception * e)
+	{
+		throw;
+	}
 }
 
 void NoeudSi::afficher(unsigned short indentation)
@@ -429,28 +484,36 @@ NoeudLire::NoeudLire(Noeud *facteur)
 
 Type * NoeudLire::getValeur()
 {
-	if (facteur->getType() == "<ENTIER>")
+	try
 	{
-		int iv;
-		cin >>iv;
-		facteur->getValeur()->setValeur(&iv);
-	}
-	else if (facteur->getType() == "<REEL>")
-	{
-		float iv;
-		cin >>iv;
-		facteur->getValeur()->setValeur(&iv);
-	}
-	else if(facteur->getType() == "<CHAINE>")
-	{
-		string iv;
-		cin >>iv;
-		facteur->getValeur()->setValeur(&iv);
-	}
+		if (facteur->getType() == "<ENTIER>")
+		{
+			int iv;
+			cin >>iv;
+			facteur->getValeur()->setValeur(&iv);
+		}
+		else if (facteur->getType() == "<REEL>")
+		{
+			float iv;
+			cin >>iv;
+			facteur->getValeur()->setValeur(&iv);
+		}
+		else if(facteur->getType() == "<CHAINE>")
+		{
+			string iv;
+			cin >>iv;
+			facteur->getValeur()->setValeur(&iv);
+		}
 
 
-	((SymboleValue*)facteur)->definir();
-	return facteur->getValeur();
+		((SymboleValue*)facteur)->definir();
+		return facteur->getValeur();
+
+	}
+	catch(Exception * e)
+	{
+		throw;
+	}
 }
 
 void NoeudLire::afficher(unsigned short indentation)
@@ -468,15 +531,21 @@ NoeudEcrire::NoeudEcrire(Noeud *facteur)
 
 Type * NoeudEcrire::getValeur()
 {
-	void * val;
-	facteur->getValeur()->getValeur(&val);
-	if (facteur->getType() == "<ENTIER>")
-		cout<< *((int *)val);
-	else if (facteur->getType() == "<REEL>")
-		cout<< *((float *)val);
-	else if(facteur->getType() == "<CHAINE>")
-		cout<< *((string *)val);
-	return facteur->getValeur();
+	try{
+		void * val;
+		facteur->getValeur()->getValeur(&val);
+		if (facteur->getType() == "<ENTIER>")
+			cout<< *((int *)val)<<endl;
+		else if (facteur->getType() == "<REEL>")
+			cout<< *((float *)val)<<endl;
+		else if(facteur->getType() == "<CHAINE>")
+			cout<< *((string *)val)<<endl;
+		return facteur->getValeur();
+	}
+	catch(Exception * e)
+	{
+		throw;
+	}
 }
 
 void NoeudEcrire::afficher(unsigned short indentation)
@@ -494,15 +563,21 @@ NoeudEcrireln::NoeudEcrireln(Noeud *facteur)
 
 Type * NoeudEcrireln::getValeur()
 {
-	void * val;
-	facteur->getValeur()->getValeur(&val);
-	if (facteur->getType() == "<ENTIER>")
-		cout<< *((int *)val);
-	else if (facteur->getType() == "<REEL>")
-		cout<< *((float *)val);
-	else if(facteur->getType() == "<CHAINE>")
-		cout<< *((string *)val);
-	return facteur->getValeur();
+	try{
+		void * val;
+		facteur->getValeur()->getValeur(&val);
+		if (facteur->getType() == "<ENTIER>")
+			cout<< *((int *)val);
+		else if (facteur->getType() == "<REEL>")
+			cout<< *((float *)val);
+		else if(facteur->getType() == "<CHAINE>")
+			cout<< *((string *)val);
+		return facteur->getValeur();
+	}
+	catch(Exception * e)
+	{
+		throw;
+	}
 }
 
 void NoeudEcrireln::afficher(unsigned short indentation)
@@ -537,15 +612,21 @@ NoeudRepeter::NoeudRepeter(Noeud *condition, Noeud * seq)
 Type *
 NoeudRepeter::getValeur()
 {
-	Type * valeur;
-	void * val;
-	do
-	{
-		getCondition()->getValeur()->getValeur(&val);
-		valeur = getSeq()->getValeur();
+	try{
+		Type * valeur;
+		void * val;
+		do
+		{
+			getCondition()->getValeur()->getValeur(&val);
+			valeur = getSeq()->getValeur();
+		}
+		while (*((int *)val));
+		return valeur;
 	}
-	while (*((int *)val));
-	return valeur;
+	catch(Exception * e)
+	{
+		throw;
+	}
 }
 
 void NoeudRepeter::afficher(unsigned short indentation)
@@ -567,15 +648,21 @@ NoeudTantque::NoeudTantque(Noeud *condition, Noeud * seq)
 
 Type * NoeudTantque::getValeur()
 {
-	Type * valeur=NULL;
-	void * val;
-	getCondition()->getValeur()->getValeur(&val);
-	while (*((int *)val))
-	{
-		valeur = getSeq()->getValeur();
+	try{
+		Type * valeur=NULL;
+		void * val;
 		getCondition()->getValeur()->getValeur(&val);
+		while (*((int *)val))
+		{
+			valeur = getSeq()->getValeur();
+			getCondition()->getValeur()->getValeur(&val);
+		}
+		return valeur;
 	}
-	return valeur;
+	catch(Exception * e)
+	{
+		throw;
+	}
 }
 
 void NoeudTantque::afficher(unsigned short indentation)
@@ -592,15 +679,21 @@ void NoeudTantque::afficher(unsigned short indentation)
 
 Type * NoeudPour::getValeur()
 {
-	Type * valeur=NULL;
-	void * cond;
-	this->getCondition()->getValeur()->getValeur(&cond);
-	for (init->getValeur(); *((int *)cond); affectation->getValeur())
-	{
-		valeur = getSeq()->getValeur();
+	try{
+		Type * valeur=NULL;
+		void * cond;
 		this->getCondition()->getValeur()->getValeur(&cond);
+		for (init->getValeur(); *((int *)cond); affectation->getValeur())
+		{
+			valeur = getSeq()->getValeur();
+			this->getCondition()->getValeur()->getValeur(&cond);
+		}
+		return valeur;
 	}
-	return valeur;
+	catch(Exception * e)
+	{
+		throw;
+	}
 }
 
 void NoeudPour::afficher(unsigned short indentation)

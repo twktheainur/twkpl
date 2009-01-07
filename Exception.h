@@ -68,6 +68,23 @@ class ExVarUndef:Exception
 	private:
 		string symbol;
 };
+
+class ExDivZero:Exception
+{
+	public:
+		ExDivZero(int line=-1,int col=-1)
+		:Exception(line,col)
+		{}
+		~ExDivZero() throw()
+		{}
+		inline const char * what()
+		{
+			stringstream err;
+			err << Exception::what() << "Division par zero";
+			return err.str().data();
+		}
+};
+
 //Exception jetee en cas de confilt de types (verif de la semantique)
 class ExTypeMismatch:public Exception
 {
