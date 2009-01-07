@@ -250,10 +250,11 @@ LecteurPhraseAvecArbre::facteur()
 	}
 	else if (ls.getSymCour() == "-" || ls.getSymCour() == "non")
 	{
+		Symbole s = 	ls.getSymCour();
 		ls.suivant();
 		// on représente le moins unaire (- facteur) par une soustractin binaire (0 - facteur)
 		fact =
-			new NoeudOperateurUnaire(ls.getSymCour(), expBool());
+			new NoeudOperateurUnaire(s, expBool());
 	}
 	else if (ls.getSymCour() == "(")
 	{

@@ -1,0 +1,11 @@
+declarer
+a:Entier;
+b:Entier;
+debut
+ecrire("a?");lire(a);
+ecrire("b?");lire(b);
+ecrire("condition:((a>20 et b>10) ou b>=100)");
+si ((a>20 et b==10) ou b>=100)
+  ecrire("Condition Remplie!");
+finsi;
+fin
