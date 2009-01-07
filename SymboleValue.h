@@ -10,48 +10,45 @@ using namespace std;
 
 class SymboleValue:public Noeud,public Symbole
 {
-public:
-  SymboleValue(Symbole s,Type * val=NULL)
-  :Symbole(s.getChaine ())
-  {
-  	//if(val==NULL)
-   //   defini = false;
-  	//else
-  		defini=false;
-    valeur=val;
-  };
-  inline string getType()
-  {
-  	if(valeur)
-  	  return valeur->getType();
-  	else
-      throw Exception();
-  }
+	public:
+		SymboleValue(Symbole s,Type * val=NULL)
+		:Symbole(s.getChaine ())
+		{
+			defini=false;
+			valeur=val;
+		};
+		//Returns the type of the value
+		inline string getType()
+		{
+			if(valeur)
+				return valeur->getType();
+			else
+				throw Exception();
+		}
 
-  inline Type * getValeur()
-  {
-    return valeur;
-  }
-  inline void setValeur(Type * val)
-  {
-    valeur=val;
-    defini=true;
-  }
+		inline Type * getValeur()//get the value
+		{
+			return valeur;
+		}
+		inline void setValeur(Type * val)
+		{
+			valeur=val;
+			defini=true;
+		}
 
-  void afficher(unsigned short indentation);
-  inline bool estDefini ()
-  {
-    return defini;
-  }
-  inline void definir()
-  {
-  	defini=true;
-  }
-  //friend ostream & operator <<(std::basic_ostream<char, std::char_traits<char> >& cout, SymboleValue symb);
-  void disp();
-private:
-  bool defini;  	// indique si la valeur du symbole est définie
-  Type * valeur;
+		void afficher(unsigned short indentation);
+		inline bool estDefini ()
+		{
+			return defini;
+		}
+		inline void definir()
+		{
+			defini=true;
+		}
+		void disp();
+	private:
+		bool defini;  	// indique si la valeur du symbole est définie
+		Type * valeur;
 
 
 };
